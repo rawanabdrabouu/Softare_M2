@@ -9,8 +9,8 @@ INSERT INTO roles("role")
     
 INSERT INTO public.users(
 	firstname, lastname, email, password, roleid)
-	VALUES ('rawna', 'alaa', 'desoukya@gmail.com', '22222', 4);
+	VALUES ('rawna', 'alaa', 'desoukya@gmail.com', '22222', 2);
 
 UPDATE users
-	SET "roleid"=4
+	SET "roleid"=2
 	WHERE "email"='desoukya@gmail.com';

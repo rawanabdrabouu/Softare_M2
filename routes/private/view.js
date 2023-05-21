@@ -11,7 +11,7 @@ const getUser = async function(req) {
   const user = await db.select('*')
     .from('sessions')
     .where('token', sessionToken)
-    .innerJoin('users', 'sessions.userId', 'users.id')
+    .innerJoin('users', 'sessions.userid', 'users.id')
     .innerJoin('roles', 'users.roleid', 'roles.id')
     .first();
   
