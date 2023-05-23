@@ -65,7 +65,4 @@ module.exports = function (app) {
     return res.status(200).send("Password has been updsatd");
   });
 
-  app.put()
-
-
 };
