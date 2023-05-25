@@ -25,7 +25,7 @@ const getUser = async function (req) {
   user.isSenior = user.roleid === roles.senior;
   return user;
 };
-
+//commment
 module.exports = function (app) {
   // example
   app.put("/users", async function (req, res) {
