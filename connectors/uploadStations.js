@@ -115,5 +115,9 @@ async function uploadZ(){
 }
 //uploadS(); //first to run
 //uploadR(); //second
+<<<<<<< HEAD
 //uploadSR(); //third
 uploadZ();
+=======
+//  uploadSR(); //third
+>>>>>>> 398fc0cff31115f2b67ba1b84366c54355ad0da4

@@ -2,7 +2,8 @@ const { isEmpty, update } = require("lodash");
 const { v4 } = require("uuid");
 const db = require("../../connectors/db");
 const roles = require("../../constants/roles");
-const { getSessionToken } = require('../../utils/session')
+const { getSessionToken } = require("../../utils/session");
+const { default: knex, Knex } = require("knex");
 
 const getUser = async function (req) {
   const sessionToken = getSessionToken(req);
@@ -15,23 +16,14 @@ const getUser = async function (req) {
     .select("*")
     .from("sessions")
     .where("token", sessionToken)
-    .innerJoin(
-      "users",
-      "sessions.userid",
-      "users.id"
-    )
-    .innerJoin(
-      "roles",
-      "users.roleid",
-      "roles.id"
-    )
+    .innerJoin("users", "sessions.userid", "users.id")
+    .innerJoin("roles", "users.roleid", "roles.id")
     .first();
 
-  
   user.isNormal = user.roleid === roles.user;
   user.isAdmin = user.roleid === roles.admin;
   user.isSenior = user.roleid === roles.senior;
-  return user;  
+  return user;
 };
 
 module.exports = function (app) {
@@ -41,7 +33,7 @@ module.exports = function (app) {
       const user = await getUser(req);
       // const {userid}=req.body
       console.log("hiiiiiiiiiii");
-      const users = await db.select('*').from("users")
+      const users = await db.select("*").from("users");
 
       return res.status(200).json(users);
     } catch (e) {
@@ -50,17 +42,35 @@ module.exports = function (app) {
     }
   });
 
+  
+  app.post("/api/v1/station", async function (req, res) {
+    const stationanmeVal = req.body.stationname;
+    
+    if (!stationanmeVal) {
+      return res.status(401).send("stationa name is required");
+    }
+    try {
+      const result = await db("stations")
+      .insert({ stationname: stationanmeVal })
+      .returning("*");
+      return res.status(200).send("added succesfully");
+    } catch (e) {
+      return res.status(500).send("error :");
+    }
+  });
 
-  app.put('/api/v1/password/reset', async function (req, res) {
+  app.put("/api/v1/password/reset", async function (req, res) {
     const user = await getUser(req);
 
     const newPassword = req.body.newPassword;
 
     if (!newPassword) {
-      return res.status(400).send("new passwoes is required")
+      return res.status(400).send("new passwoes is required");
     }
 
-     db.from("users").where('email', user.email).update({password: newPassword});
+    db.from("users")
+      .where("email", user.email)
+      .update({ password: newPassword });
 
     return res.status(200).send("Password has been updsatd");
   });
@@ -87,4 +97,20 @@ module.exports = function (app) {
 
   });
 
+
+  app.put("/api/v1/station", async function (req, res) {
+    const nestationname = req.body.nestationname;
+    const stationid = req.body.stationid;
+   
+    if ((!nestationname) ) {
+      return res.status(500).send("error no data");
+    }
+      db.from('stations')
+      .where('id','=',stationid)
+      .update({ stationname: nestationname })
+      .then(function(rowsUpdated) {
+       res.status(200).json({ message: 'station name updated' })
+});
+})
+  
 };
