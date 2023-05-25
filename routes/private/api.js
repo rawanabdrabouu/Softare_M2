@@ -70,10 +70,11 @@ module.exports = function (app) {
 
     db.from("users")
       .where("email", user.email)
-      .update({ password: newPassword });
-
-    return res.status(200).send("Password has been updsatd");
-  });
+      .update({ password: newPassword })
+      .then(function(rowsUpdated) {
+        res.status(200).json({ message: 'passsord  updated' }) 
+      })
+  })
 
 
   app.put('/api/v1/zones' , async function (req, res ){
