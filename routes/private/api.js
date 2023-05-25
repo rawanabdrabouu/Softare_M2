@@ -64,4 +64,27 @@ module.exports = function (app) {
 
     return res.status(200).send("Password has been updsatd");
   });
+
+
+  app.put('/api/v1/zones' , async function (req, res ){
+    //const user = await getUser(req);
+    
+    const zoneId = req.body.zoneId;
+    const price = req.body.price;
+
+    if(!zoneId){
+      return res.status(400).send("error: pls enter zone id");
+    }
+    if(zoneId>3){
+      return res.status(400).send("error: zone not found");
+    }
+    db.from('zones')
+    .where('id' ,zoneId)
+    .update({price : price})
+    .then(function(rowsUpdated) {
+      res.status(200).json({ message: '${rowsUpdated}  updated' });
+  });
+
+  });
+
 };

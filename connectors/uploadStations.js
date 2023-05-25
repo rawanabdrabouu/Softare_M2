@@ -95,12 +95,25 @@ async function uploadR() {
       { routename: "hi76", fromstationid: 7, tostationid: 6 },
       { routename: "hi67", fromstationid: 6, tostationid: 7 },
     ];
- 
+    
   for (let i = 0; i < routes.length; i++) {
     const element =routes[i];
     await db("routes").insert(element).returning("*");
   }
 }
- //uploadS(); //first to run
+
+async function uploadZ(){
+  let zones = [
+    { zonetype: "z1", price:5},
+    {zonetype: "z2", price:7},
+    {zonetype:"z3", price:10}
+  ]
+  for( let i=0; i< zones.length;i++){
+    const element = zones[i]
+    await db("zones").insert(element).returning("*");
+  }
+}
+//uploadS(); //first to run
 //uploadR(); //second
-uploadSR(); //third
+//uploadSR(); //third
+uploadZ();
