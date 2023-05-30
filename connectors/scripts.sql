@@ -115,7 +115,7 @@ CREATE TABLE IF NOT EXISTS routes
     toStationid INTEGER NOT NULL,
     CONSTRAINT routes_pkey PRIMARY KEY (id),
     FOREIGN KEY( fromStationid ) REFERENCES stations on DELETE CASCADE on UPDATE CASCADE,
-    FOREIGN KEY( toStationid ) REFERENCES stations  on DELETE CASCADE on UPDATE CASCADE
+    FOREIGN KEY( toStationid ) REFERENCES   stations  on DELETE CASCADE on UPDATE CASCADE
 
 );
 

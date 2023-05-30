@@ -115,9 +115,17 @@ async function uploadZ(){
 }
 //uploadS(); //first to run
 //uploadR(); //second
-<<<<<<< HEAD
 //uploadSR(); //third
-uploadZ();
-=======
-//  uploadSR(); //third
->>>>>>> 398fc0cff31115f2b67ba1b84366c54355ad0da4
+//uploadZ();
+// async function uploadsubtype() {
+//   let  subscriptontype   =[ { subtype: "annual", nooftickets: 100, price: 150 },
+//      { subtype: "quarterly", nooftickets: 50, price: 100 },
+//      { subtype: "monthly", nooftickets: 10, price: 50 }
+//    ];
+//    for (let i = 0; i < subscriptontype.length; i++) {
+//      const element = subscriptontype[i];
+//      await db("subscriptontype").insert(element).returning("*");
+//    }
+//  }
+
+//uploadsubtype();

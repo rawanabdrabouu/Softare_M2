@@ -11,7 +11,6 @@ const getUser = async function (req) {
     return res.status(301).redirect("/");
   }
 
-  console.log(sessionToken);
   const user = await db
     .select("*")
     .from("sessions")
@@ -110,11 +109,25 @@ module.exports = function (app) {
   });
 
   app.delete("/api/v1/station/:stationID", async function (req, res) {
+    console.log(req);
     const stationid = req.params.stationID;
 
     db.from("stations")
       .del()
       .where("id", "=", stationid)
+      .then(function () {
+        fromstationid = db
+          .from("routes")
+          .where("fromstationid", stationid)
+          .returning("*");
+
+        tostationid = db
+          .from("routes")
+          .where("tostationid", stationid)
+          .insert({ tostationid: fromstationid.tostationid });
+
+        db.from("stationroutes").del().where("stationid", "=", stationid);
+      })
       .then(function (deleted) {
         if (deleted) {
           res.status(200).json({ message: "station  deleted" });
@@ -177,58 +190,11 @@ module.exports = function (app) {
     }
   });
 
-  app.put("/api/v1/requests/senior/:requestId", async function (req, res) {
-    //req: status of request
-    //all requests with status/req == on-going change their status value to either accepted or rejected
-    //according to their current age
-
-    //1st: check if current user is admin
-    const user = await getUser(req);
-    if (!user.isAdmin) {
-      return res.status(400).send("user isn't authorised to do this action");
+  app.get(
+    "/api/v1/tickets/price/:originId & :destinationId",
+    async function (req, res) {
+      const originId = req.params.originId;
+      const destinationId = req.params.destinationId;
     }
-    if (!req) {
-      return res.status(400).send("input isn't sent correctly");
-    }
-
-    const requestId = req.params.requestId.substring(1);
-    if (req.body.status == "accepted" || req.body.status == "accept") {
-      db.from("senior_requests")
-        .where("id", requestId)
-        .update({ status: "accepted" })
-        .then((status) => {
-          const newSeniorId = db
-            .from("senior_requests")
-            .where("id", requestId)
-            .select("userid");
-          db.from("users")
-            .where("id", newSeniorId)
-            .update({ roleid: 3 })
-            .then((roleid) => {
-              res.status(200).send("roleid is updated");
-            })
-            .catch((err) => {
-              res
-                .status(500)
-                .send("error updating user's role id with id = " + user.id);
-            });
-          res.status(200).send("status is updated");
-        })
-        .catch((err) => {
-          res.status(500).send("error updating request with id = " + user.id);
-        });
-    } else if (req.body.status == "rejected" || req.body.status == "reject") {
-      db.from("senior_requests")
-        .where("id", requestId)
-        .update({ status: "rejected" })
-        .then((status) => {
-          return res.status(200).send("Status has been updated");
-        })
-        .catch((err) => {
-          res
-            .status(500)
-            .send("error updating request with user id = " + user.id);
-        });
-    }
-  });
+  ); 
 };
