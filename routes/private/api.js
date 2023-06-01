@@ -172,24 +172,16 @@ app.put("/api/v1/requests/senior/:requestId", async function(req, res){//req: st
     return res.status(400).send("input isn't sent correctly");
   }
 
-  const requestId = req.params.requestId.substring(1)
+  const requestId = req.params.requestId
   if(req.body.seniorStatus == 'accepted' || req.body.seniorStatus == 'accept'){
-    db.from("senior_requests").where('id', requestId).update({'status': 'accepted'})
-    .then(status => {
-      const newSeniorId = db.from("senior_requests").where('id', requestId).select('userid')
-      db.from("users").where('id', newSeniorId).update({'roleid': 3})
-      .then(roleid => {
-        res.status(200).send("roleid is updated");
-      })
-      .catch(err => {
-        res.status(500).send("error updating user's role id with id = " + user.id);
-      });
-      res.status(200).send("status is updated");
-    })
-    .catch(err => {
-      res.status(500).send("error updating request with id = " + user.id);
-    });
-  }else if(req.body.seniorStatus == 'rejected' || req.body.seniorStatus == 'reject'){
+    await db.from("senior_requests").where('id', requestId).update({'status': 'accepted'})
+    const newSeniorId = db.from("senior_requests").where('id', requestId).select('userid')
+    await db.from("users").where('id', newSeniorId).update({'roleid': 3})
+    const oldamount = await db.from("transactions").where('userid', newSeniorId).select('amount').first()
+    console.log('old amount is ', oldamount)
+    await db.from("transactions").where('userid', newSeniorId).update({'amount': oldamount.amount/2})   
+    return res.status(200).send("status has been updated")
+    }else if(req.body.seniorStatus == 'rejected' || req.body.seniorStatus == 'reject'){
     db.from("senior_requests").where('id', requestId).update({'status': 'rejected'})
     .then(status => {
       return res.status(200).send("Status has been updated");
