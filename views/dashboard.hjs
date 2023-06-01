@@ -28,7 +28,12 @@
           </ul>
        </nav>
       </div>
-      <p>Welcome {{firstname}}, you are logged in!</p>
+      <p><center><h2>Welcome {{firstname}}, you are logged in!</h2></center></p>
+      <div>
+        <center>
+          <a href="/resetPassword" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Reset Password</a>
+        </center>
+      </div>
     </div>
   </body>
   </html>

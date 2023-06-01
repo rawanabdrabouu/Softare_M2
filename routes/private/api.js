@@ -68,12 +68,8 @@ module.exports = function (app) {
       return res.status(400).send("new passwoes is required");
     }
 
-    db.from("users")
-      .where("email", user.email)
-      .update({ password: newPassword })
-      .then(function(rowsUpdated) {
-        res.status(200).json({ message: 'passsord  updated' }) 
-      })
+    await db.from("users").where("email", user.email).update({ password: newPassword })
+    return res.status(200).send('passsword  updated') 
   })
 
 
@@ -178,9 +174,10 @@ app.put("/api/v1/requests/senior/:requestId", async function(req, res){//req: st
     const newSeniorId = db.from("senior_requests").where('id', requestId).select('userid')
     await db.from("users").where('id', newSeniorId).update({'roleid': 3})
     const oldamount = await db.from("transactions").where('userid', newSeniorId).select('amount').first()
-    console.log('old amount is ', oldamount)
+    // console.log('old amount is ', oldamount)
     await db.from("transactions").where('userid', newSeniorId).update({'amount': oldamount.amount/2})   
     return res.status(200).send("status has been updated")
+
     }else if(req.body.seniorStatus == 'rejected' || req.body.seniorStatus == 'reject'){
     db.from("senior_requests").where('id', requestId).update({'status': 'rejected'})
     .then(status => {

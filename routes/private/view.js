@@ -15,7 +15,6 @@ const getUser = async function(req) {
     .innerJoin('roles', 'users.roleid', 'roles.id')
     .first();
   
-  console.log('user =>', user)
   user.isStudent = user.roleid === roles.student;
   user.isAdmin = user.roleid === roles.admin;
   user.isSenior = user.roleid === roles.senior;
@@ -28,6 +27,11 @@ module.exports = function(app) {
   app.get('/dashboard', async function(req, res) {
     const user = await getUser(req);
     return res.render('dashboard', user);
+  });
+
+  app.get('/resetPassword', async function(req, res) {
+    const user = await getUser(req);
+    return res.render('resetPassword', user);
   });
 
   // Register HTTP endpoint to render /users page
