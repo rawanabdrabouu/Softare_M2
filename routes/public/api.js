@@ -15,8 +15,8 @@ app.post("/api/v1/user", async function (req, res) {
     }
 
     const newUser = {
-      firstname: req.body.firstName,
-      lastname: req.body.lastName,
+      firstname: req.body.firstname,
+      lastname: req.body.lastname,
       email: req.body.email,
       password: req.body.password,
       roleid: roles.user,
@@ -24,7 +24,7 @@ app.post("/api/v1/user", async function (req, res) {
     try {
       const user = await db("users").insert(newUser).returning("*");
 
-      return res.status(200).json(user );
+      return res.status(200).json(user);
     } catch (e) {
       console.log(e.message);
       return res.status(400).send("Could not register user");

@@ -15,9 +15,9 @@ const getUser = async function(req) {
     .innerJoin('roles', 'users.roleid', 'roles.id')
     .first();
   
-  user.isStudent = user.roleid === roles.student;
-  user.isAdmin = user.roleid === roles.admin;
-  user.isSenior = user.roleid === roles.senior;
+    user.isNormal = user.roleid === roles.user;
+    user.isAdmin = user.roleid === roles.admin;
+    user.isSenior = user.roleid === roles.senior;
 
   return user;  
 }
@@ -26,11 +26,12 @@ module.exports = function(app) {
   // Register HTTP endpoint to render /users page
   app.get('/dashboard', async function(req, res) {
     const user = await getUser(req);
-    return res.render('dashboard', user);
+    return res.render('dashboard', {...user});
   });
 
   app.get('/resetPassword', async function(req, res) {
     const user = await getUser(req);
+    console.log(user)
     return res.render('resetPassword', user);
   });
 
@@ -45,6 +46,22 @@ module.exports = function(app) {
     const user = await getUser(req);
     const stations = await db.select('*').from('stations');
     return res.render('stations_example', { ...user, stations });
+  });
+
+  app.get('/requests/senior', async function(req, res) {
+    const user = await getUser(req);
+    return res.render('requests/senior', user);
+  });
+
+  app.get('/requests/refund', async function(req, res) {
+    const user = await getUser(req);
+    const reqs = await db.from('tickets').select('*').where('userid', user.userid);
+    return res.render('requests/refund', {reqs});
+  });
+
+  app.get('/manage/requests/seniors', async function(req, res) {
+    const reqs = await db.from('senior_requests').select('*').where('status', 'pending');
+    return res.render('manage/seniors.hjs', {reqs});
   });
 
 };
