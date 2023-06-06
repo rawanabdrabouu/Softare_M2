@@ -113,8 +113,8 @@ async function uploadZ(){
     await db("zones").insert(element).returning("*");
   }
 }
-//uploadS(); //first to run
-//uploadR(); //second
+ //uploadS(); //first to run
+ //uploadR(); //second\uploadStations.js
 //uploadSR(); //third
 //uploadZ();
 // async function uploadsubtype() {
