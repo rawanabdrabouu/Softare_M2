@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+    <title>zones table </title>
+    <link rel='stylesheet' href='/styles/bootstrap.min.css' />
+    <link rel='stylesheet' href='/styles/style.css' />
+    <script src="/js/jquery-2.2.0.min.js" type="text/javascript"></script>
+    <script src="/js/bootstrap.min.js" type="text/javascript"></script>
+  </head>
+
+<body>
+
+    <div>
+        <nav class="navbar navbar-inverse" style="padding-left:130px;">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="/dashboard">Home</a></li>
+                <li><a href="/stations_example">Station</a></li>
+                <li><a href="/users">Users</a></li>
+                <li><a href="/users/add">Add Users</a></li>
+                <li><a href="/">Logout</a></li>
+            </ul>
+        </nav>
+    </div>
+    <div class="center">
+        <br />
+        <table class="table" style="margin-left: 20px;">
+            <thead>
+                <tr>
+                    <th scope="col">Zone ID</th>
+                    <th scope="col">zone type</th>
+                    <th scope="col">zone price</th>
+
+                </tr>
+                {{#zones}}
+                <tr>
+                    <td>{{id}}</td>
+                    <td>{{zonetype}}</td>
+                    <td>{{price}}</td>
+                    <td>
+                </tr>
+                {{/zones}}
+            </thead>
+        </table>
+</body>
+
+</html>
+
+{{!-- <td> <input id="
+                    stationname" type="text" class="form-control price" name="name" placeholder=""
+                            value="{{stationname}}</td> 
+
+ {{!-- <input id="btndelete" type="button" value="delete" class="btn btn-danger"> bn3ml
+                        button--}}
+                        {{!-- <a id="btnEDIT" href="/manage/stations/edit" class="btn btn-success">Edit</a> anker listen
+                        byroh l safha tanya--}}                            

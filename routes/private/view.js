@@ -42,5 +42,11 @@ module.exports = function(app) {
     const stations = await db.select('*').from('stations');
     return res.render('stations_example', { ...user, stations });
   });
+  app.get('/subscriptions', async function(req, res) {
+    const user = await getUser(req);
+    const stations = await db.select('*').from('subsription');
+    return res.render('subsription', { subsription });
+  });
 
+  
 };
