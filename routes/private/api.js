@@ -11,7 +11,6 @@ const getUser = async function (req) {
     return res.status(301).redirect("/");
   }
 
-  console.log(sessionToken);
   const user = await db
     .select("*")
     .from("sessions")
@@ -70,41 +69,42 @@ module.exports = function (app) {
     await db
       .from("users")
       .where("email", user.email)
-      .update({ password: newPassword });
-    return res.status(200).send("passsword  updated");
-  });
-
-  app.put("/api/v1/zones", async function (req, res) {
-    //const user = await getUser(req);
-
-    const zoneId = req.body.zoneId;
-    const price = req.body.price;
-
-    if (!zoneId) {
-      return res.status(400).send("error: pls enter zone id");
-    }
-    if (zoneId > 3) {
-      return res.status(400).send("error: zone not found");
-    }
-    db.from("zones")
-      .where("id", zoneId)
-      .update({ price: price })
-      .then(function (rowsUpdated) {
-        res.status(200).json({ message: "${rowsUpdated}  updated" });
+      .update({ password: newPassword })
+      .then(function () {
+        res.status(200).json({ message: "passsord  updated" });
       });
   });
 
-  app.put("/api/v1/station", async function (req, res) {
+  app.put("/api/v1/zones/:zoneId", async function (req, res) {
+    //const user = await getUser(req);
+
+    const zoneId = req.params.zoneId;
+    const price = req.body.price;
+
+    if (!price) {
+      return res.status(400).send("error: pls enter price");
+    }
+
+    db.from("zones")
+      .where("id", zoneId)
+      .update({ price: price })
+      .then(function () {
+        res.status(200).json({ message: "zone has been updated" });
+      });
+  });
+
+  app.put("/api/v1/station/:stationID", async function (req, res) {
     const nestationname = req.body.nestationname;
-    const stationid = req.body.stationid;
+    const stationid = req.params.stationID;
 
     if (!nestationname) {
       return res.status(500).send("error no data");
     }
+
     db.from("stations")
       .where("id", "=", stationid)
       .update({ stationname: nestationname })
-      .then(function (rowsUpdated) {
+      .then(function () {
         res.status(200).json({ message: "station name updated" });
       });
   });
@@ -123,10 +123,8 @@ module.exports = function (app) {
       .from("users")
       .select("id")
       .where("email", user.email);
-    if (user.isAdmin){
-      console.log(user);
+    if (user.isAdmin)
       return res.status(400).send("An admin can't send a senior request");
-    }
     //check if senior request already exists in table
     const requestExists = await db
       .select("*")
@@ -167,7 +165,7 @@ module.exports = function (app) {
 
   app.put("/api/v1/requests/senior/:requestId", async function (req, res) {
     //req: status of request
-    //all requests with status/req == pending change their status value to either accepted or rejected
+    //all requests with status/req == on-going change their status value to either accepted or rejected
     //according to their current age
 
     //1st: check if current user is admin
@@ -413,34 +411,201 @@ module.exports = function (app) {
       .where("fromstationid", tostationid.tostationid)
       .where("tostationid", fromstation.fromstationid)
       .first();
-    if(!secondDirec){//no second route yb2a el route el ana 3ayza amsa7o howa el wa7eed el mawgood
-      if (stationfrom.stationposition == "start" && stationto.stationposition == "middle") {
+    if (!secondDirec) {
+      //no second route yb2a el route el ana 3ayza amsa7o howa el wa7eed el mawgood
+      if (
+        stationfrom.stationposition == "start" &&
+        stationto.stationposition == "middle"
+      ) {
         await db
-        .from("stations")
-        .where("id", tostationid.tostationid)
-        .update({ stationposition: "start" });
+          .from("stations")
+          .where("id", tostationid.tostationid)
+          .update({ stationposition: "start" });
         await db
-        .from("stations")
-        .where("id", fromstation.fromstationid)
-        .update({ stationposition: null});
-        await db.from("stations")
-        .where("id", fromstation.fromstationid)
-        .update({ stationtype: "new" });
+          .from("stations")
+          .where("id", fromstation.fromstationid)
+          .update({ stationposition: null });
+        await db
+          .from("stations")
+          .where("id", fromstation.fromstationid)
+          .update({ stationtype: "new" });
         await db.from("routes").del().where("id", "=", routeId);
         return res.status(200).send("Route deleted");
       }
-    }else{//el ana 3ayza amsa7o is the 2nd route
-      if (stationfrom.stationposition == "start" && (stationto.stationposition == "middle" || stationto.stationposition == "end")) {
+    } else {
+      //el ana 3ayza amsa7o is the 2nd route
+      if (
+        stationfrom.stationposition == "start" &&
+        (stationto.stationposition == "middle" ||
+          stationto.stationposition == "end")
+      ) {
         await db
-        .from("stations")
-        .where("stationposition", 'end')
-        .update({ stationposition: "start" });
+          .from("stations")
+          .where("stationposition", "end")
+          .update({ stationposition: "start" });
         await db.from("routes").del().where("id", routeId);
         return res.status(200).send("Route deleted");
-      }else if ((stationfrom.stationposition == "middle" || stationfrom.stationposition == "end") && stationto.stationposition == "start") {
+      } else if (
+        (stationfrom.stationposition == "middle" ||
+          stationfrom.stationposition == "end") &&
+        stationto.stationposition == "start"
+      ) {
         await db.from("routes").del().where("id", routeId);
         return res.status(200).send("Route deleted");
       }
     }
   });
+
+  app.delete("/api/v1/station/:stationID", async function (req, res) {
+    // console.log(req);
+    const stationID = req.params.stationID;
+    const station = await db.from("stations").where("id", stationID).first();
+
+    if (station.stationposition == "start") {
+      const totation = await db
+        .from("routes")
+        .where("fromstationid", stationID)
+        .first();
+
+      await db
+        .from("stations")
+        .where("id", totation.tostationid)
+        .update({ stationposition: "start" });
+
+      await db.from("stations").where("id", stationID).del();
+
+      return res.status(200).send("deleted");
+    } else if (station.stationposition == "end") {
+      const fromStation = await db
+        .from("routes")
+        .where("tostationid", stationID)
+        .first();
+
+      await db
+        .from("stations")
+        .where("id", fromStation.fromstationid)
+        .update({ stationposition: "end" });
+
+      await db.from("stations").where("id", stationID).del();
+      return res.status(200).send("deleted");
+    } else if (station.stationposition == "middle") {
+      if (station.stationtype == "normal") {
+        const fromstations = await db
+          .select("*")
+          .from("routes")
+          .where("fromstationid", station.id); // 2
+
+        // 1 - 3
+        if (fromstations && fromstations.length == 2) {
+          const s1 = fromstations[0].tostationid; // 1
+          const s2 = fromstations[1].tostationid; // 3
+
+          const r1 = await db("routes")
+            .insert({
+              routename: "hi" + s1 + s2,
+              fromstationid: s1,
+              tostationid: s2,
+            })
+            .returning("id"); //1 -3
+
+          const r2 = await db("routes")
+            .insert({
+              routename: "hi" + s2 + s1,
+              fromstationid: s2,
+              tostationid: s1,
+            })
+            .returning("id"); // 3-1
+
+          const stationroute = await db("stationroutes")
+            .insert([
+              { stationid: s1, routeid: r1 },
+              { stationid: s2, routeid: r1 },
+              { stationid: s1, routeid: r2 },
+              { stationid: s2, routeid: r2 },
+            ])
+            .returning("*")
+            .toString();
+
+          await db.from("stations").where("id", stationID).del();
+          return res.status(200).send("deleted");
+        } else {
+          return res.status(401).send("cant find station");
+        }
+      } else if (station.stationtype == "transfer") {
+        const fromstations = await db
+          .select("*")
+          .from("routes")
+          .where("fromstationid", station.id);
+
+        if (fromstations && fromstations.length > 0) {
+          fromstations.forEach(async (st) => {
+            const stationroutes = await db
+              .select("*")
+              .from("stationroutes")
+              .where("stationid", st.tostationid);
+            console.log(stationroutes);
+            if (stationroutes.length === 2) {
+              console.log(stationroutes);
+            }
+          });
+        }
+      }
+    }
+  });
+
+  app.post("/api/v1/tickets/price/:originId/:destinationId",
+    async function (req, res) {
+      const originId = req.params.originId;
+      const destinationId = req.params.destinationId;
+      const routes = await db
+        .from("routes")
+        .select("fromstationid", "tostationid");
+
+      let retult = getRouteStation(routes, originId, destinationId);
+
+      return res.status(200).json(retult);
+      function getRouteStation(routes, from, to) {
+        let originId = parseInt(from);
+        let destinationId = parseInt(to);
+
+        let visited = new Set();
+        visited.add(originId);
+        let shortestRoute = [];
+        DFS(originId, destinationId, [], visited);
+        return shortestRoute;
+      }
+        function DFS(currStationID, destinationId, inroute, visited) {
+          if (currStationID === destinationId) {
+            if (
+              shortestRoute.length === 0 ||
+              shortestRoute.length > inroute.length
+            ) {
+              shortestRoute = [...inroute];
+            }
+            return;
+          }
+          console.log(shortestRoute)
+
+          let nextStations = routes
+            .map((st) =>
+              st.fromstationid === currStationID && !visited.has(st.tostationid)
+                ? st
+                : undefined
+            )
+            .filter((st) => st !== undefined);
+
+          for (let nextStation of nextStations) {
+            visited.add(nextStation.tostationid);
+            DFS(
+              nextStation.tostationid,
+              destinationId,
+              [...inroute, nextStation],
+              visited
+            );
+            visited.delete(nextStation.tostationid);
+          }
+          
+      }
+    }
+  );
 };

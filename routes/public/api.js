@@ -54,7 +54,6 @@ app.post("/api/v1/user", async function (req, res) {
     if (isEmpty(user)) {
       return res.status(400).send("user does not exist");
     }
-
     if (user.password !== password) {
       return res.status(401).send("Password does not match");
     }
@@ -83,4 +82,6 @@ app.post("/api/v1/user", async function (req, res) {
       return res.status(400).send("Could not register user");
     }
   });
+
+
 }
