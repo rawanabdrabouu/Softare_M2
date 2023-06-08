@@ -335,7 +335,8 @@ module.exports = function (app) {
     ) {
       await db
         .from("refund_requests")
-        .where("status", "pending")
+        .where("userid", ticketId.userid)
+        .where("ticketid", ticketId.ticketid)
         .update({ status: "accepted" });
       //tickets and rides table ha-delete menhom el ride el refunded
       //await db.from("tickets").del().where('id', ticketId).where('userid', currentUserId)
@@ -352,7 +353,6 @@ module.exports = function (app) {
       }
       //ADD 7TET ADDING TICKETS OF SUBSCRIPTION IF USER IS SUBSCRIBED LAW LAA YB2A 5ALAS
       if (payPlanStr.includes("subscription")) {
-        console.log("here");
         const nooftickets = await db
           .from("subsription")
           .where("id", subsid.subid)
@@ -374,7 +374,7 @@ module.exports = function (app) {
       } else {
         res.status(200).send("refund request status is updated");
       }
-    } else if (req.body.status == "rejected" || req.body.status == "reject") {
+    } else if (req.body.refundStatus == "rejected" || req.body.refundStatus == "reject") {
       await db
         .from("refund_requests")
         .where("id", requestId)

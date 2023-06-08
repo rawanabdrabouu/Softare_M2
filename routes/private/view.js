@@ -61,7 +61,12 @@ module.exports = function(app) {
 
   app.get('/manage/requests/seniors', async function(req, res) {
     const reqs = await db.from('senior_requests').select('*').where('status', 'pending');
-    return res.render('manage/seniors.hjs', {reqs});
+    return res.render('manage/requests/seniors', {reqs});
+  });
+
+  app.get('/manage/requests/refunds', async function(req, res) {
+    const reqs = await db.from('refund_requests').select('*').where('status', 'pending');
+    return res.render('manage/requests/refunds', {reqs});
   });
 
 };
