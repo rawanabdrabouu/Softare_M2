@@ -1,9 +1,10 @@
-const { isEmpty, update } = require("lodash");
+const { isEmpty, update, result, xor } = require("lodash");
 const { v4 } = require("uuid");
 const db = require("../../connectors/db");
 const roles = require("../../constants/roles");
 const { getSessionToken } = require("../../utils/session");
 const { default: knex, Knex } = require("knex");
+const { log } = require("async");
 
 const getUser = async function (req) {
   const sessionToken = getSessionToken(req);
@@ -43,17 +44,24 @@ module.exports = function (app) {
 
   app.post("/api/v1/station", async function (req, res) {
     const stationanmeVal = req.body.stationname;
-
+    const stationtype = req.body.stationtype;
     if (!stationanmeVal) {
       return res.status(401).send("stationa name is required");
     }
+    if (!stationtype) {
+      return res.status(401).send("stationa type is required");
+    }
     try {
       const result = await db("stations")
-        .insert({ stationname: stationanmeVal })
+        .insert({
+          stationname: stationanmeVal,
+          stationtype: stationtype,
+          stationstatus: "new",
+        })
         .returning("*");
       return res.status(200).send("added succesfully");
     } catch (e) {
-      return res.status(500).send("error :");
+      return res.status(500).send("error :" + e);
     }
   });
 
@@ -85,16 +93,17 @@ module.exports = function (app) {
       return res.status(400).send("error: pls enter price");
     }
 
-    db.from("zones")
+    await db
+      .from("zones")
       .where("id", zoneId)
       .update({ price: price })
       .then(function () {
-        res.status(200).json({ message: "zone has been updated" });
+        return res.status(200).json({ message: "zone has been updated" });
       });
   });
 
   app.put("/api/v1/station/:stationID", async function (req, res) {
-    const nestationname = req.body.nestationname;
+    const nestationname = req.body.stationname;
     const stationid = req.params.stationID;
 
     if (!nestationname) {
@@ -372,7 +381,10 @@ module.exports = function (app) {
       } else {
         res.status(200).send("refund request status is updated");
       }
-    } else if (req.body.refundStatus == "rejected" || req.body.refundStatus == "reject") {
+    } else if (
+      req.body.refundStatus == "rejected" ||
+      req.body.refundStatus == "reject"
+    ) {
       await db
         .from("refund_requests")
         .where("id", requestId)
@@ -457,10 +469,13 @@ module.exports = function (app) {
   });
 
   app.delete("/api/v1/station/:stationID", async function (req, res) {
-    // console.log(req);
     const stationID = req.params.stationID;
+
     const station = await db.from("stations").where("id", stationID).first();
 
+    if (!station) {
+      return res.status(404).send("station not found !!");
+    }
     if (station.stationposition == "start") {
       const totation = await db
         .from("routes")
@@ -553,7 +568,8 @@ module.exports = function (app) {
     }
   });
 
-  app.post("/api/v1/tickets/price/:originId/:destinationId",
+  app.post(
+    "/api/v1/tickets/price/:originId/:destinationId",
     async function (req, res) {
       const originId = req.params.originId;
       const destinationId = req.params.destinationId;
@@ -562,50 +578,63 @@ module.exports = function (app) {
         .select("fromstationid", "tostationid");
 
       let retult = getRouteStation(routes, originId, destinationId);
-
-      return res.status(200).json(retult);
-      function getRouteStation(routes, from, to) {
-        let originId = parseInt(from);
-        let destinationId = parseInt(to);
-
-        let visited = new Set();
-        visited.add(originId);
-        let shortestRoute = [];
-        DFS(originId, destinationId, [], visited);
-        return shortestRoute;
-      }
-        function DFS(currStationID, destinationId, inroute, visited) {
-          if (currStationID === destinationId) {
-            if (
-              shortestRoute.length === 0 ||
-              shortestRoute.length > inroute.length
-            ) {
-              shortestRoute = [...inroute];
-            }
-            return;
-          }
-          console.log(shortestRoute)
-
-          let nextStations = routes
-            .map((st) =>
-              st.fromstationid === currStationID && !visited.has(st.tostationid)
-                ? st
-                : undefined
-            )
-            .filter((st) => st !== undefined);
-
-          for (let nextStation of nextStations) {
-            visited.add(nextStation.tostationid);
-            DFS(
-              nextStation.tostationid,
-              destinationId,
-              [...inroute, nextStation],
-              visited
-            );
-            visited.delete(nextStation.tostationid);
-          }
-          
+      if (result.length <= 9) {
+        await db.from("zones").select("price").where("id", 1);
+      } else if (result.length <= 16) {
+        await db.from("zones").select("price").where("id", 2);
+      } else if (result.length > 16) {
+        await db
+          .from("zones")
+          .select("price")
+          .where("id", 3)
+          .then(function () {
+            return res.status(200).json({ message: "zone has been updated" });
+          });
+      } else {
+        return res.status(400).send("error: pls enter price");
       }
     }
   );
+
+  function getRouteStation(routes, from, to) {
+    let originId = parseInt(from);
+    let destinationId = parseInt(to);
+
+    let visited = new Set();
+    visited.add(originId);
+    let shortestRoute = [];
+    DFS(originId, destinationId, [], visited);
+    return shortestRoute;
+
+    function DFS(currStationID, destinationId, inroute, visited) {
+      if (currStationID === destinationId) {
+        if (
+          shortestRoute.length === 0 ||
+          shortestRoute.length > inroute.length
+        ) {
+          shortestRoute = [...inroute];
+        }
+        return;
+      }
+
+      let nextStations = routes
+        .map((st) =>
+          st.fromstationid === currStationID && !visited.has(st.tostationid)
+            ? st
+            : undefined
+        )
+        .filter((st) => st !== undefined);
+
+      for (let nextStation of nextStations) {
+        visited.add(nextStation.tostationid);
+        DFS(
+          nextStation.tostationid,
+          destinationId,
+          [...inroute, nextStation],
+          visited
+        );
+        visited.delete(nextStation.tostationid);
+      }
+    }
+  }
 };

@@ -15,9 +15,9 @@ const getUser = async function(req) {
     .innerJoin('roles', 'users.roleid', 'roles.id')
     .first();
   
-    user.isNormal = user.roleid === roles.user;
-    user.isAdmin = user.roleid === roles.admin;
-    user.isSenior = user.roleid === roles.senior;
+  user.isStudent = user.roleid === roles.student;
+  user.isAdmin = user.roleid === roles.admin;
+  user.isSenior = user.roleid === roles.senior;
 
   return user;  
 }
@@ -68,5 +68,35 @@ module.exports = function(app) {
     const reqs = await db.from('refund_requests').select('*').where('status', 'pending');
     return res.render('manage/requests/refunds', {reqs});
   });
+
+
+  app.get('/manage/stations/create', async function(req, res) {
+    return res.render('manage/stations/create.hjs')
+
+  });
+
+  app.get('/manage/zones', async function(req, res) {
+    const reqs =await db.from('zones').select('*');
+    return res.render('manage/zones.hjs',{reqs});
+
+  });
+
+  app.get('/manage/stations', async function(req, res) {
+    const reqs =await db.from('stations').select('*');
+    return res.render('manage/stations/index.hjs',{reqs});
+
+  });
+
+  app.get('/manage/stations/edit/:stationId', async function(req, res) {
+    const stationId = req.params.stationId;
+
+    const station =await db.from('stations').where('id',stationId).first();
+    return res.render('manage/stations/edit.hjs',{station});
+
+  });
+
+
+
+
 
 };
