@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS rides
     ticketid integer not null,
     tripdate timestamp not null,
     FOREIGN KEY( userid ) REFERENCES users,
-    FOREIGN KEY( ticketid ) REFERENCES rides,
+    FOREIGN KEY( ticketid ) REFERENCES tickets,
     CONSTRAINT rides_pkey PRIMARY KEY (id)
 );
 CREATE TABLE IF NOT EXISTS transactions
@@ -75,6 +75,7 @@ CREATE TABLE IF NOT EXISTS transactions
     amount INTEGER NOT NULL,
     userid INTEGER NOT NULL,
     purchasedIid text NOT NULL,
+    purchasetype text NOT NULL,
     FOREIGN KEY( userid ) REFERENCES users,
     CONSTRAINT transactions_pkey PRIMARY KEY (id)
 );

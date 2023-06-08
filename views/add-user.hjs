@@ -12,7 +12,7 @@
     $(document).ready(function(){
       $("#submit").click(function() {
         const firstname = $('#firstname').val();
-                const firstname = $('#firstname').val();
+        const firstname = $('#firstname').val();
 
         const lastname = $('#lastname').val();
         const major = $('#major').val();
