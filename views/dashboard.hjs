@@ -63,8 +63,12 @@
           <a href="/manage/requests/seniors" class="btn btn-success btn-lg active" role="button" aria-pressed="true">Manage Senior Requests</a>
           <a href="/manage/requests/refunds" class="btn btn-danger btn-lg active" role="button" aria-pressed="true">Manage Refund Requests</a>
           {{/isAdmin}}
+          
 
         </center>
+        <div style="">          
+            <img src="images/img.png" style="height:600px;width:600px;"alt="">
+        </div>
       </div>
     </div>
   </body>
