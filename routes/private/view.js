@@ -63,8 +63,18 @@ module.exports = function (app) {
 
   app.get('/requests/refund', async function(req, res) {
     const user = await getUser(req);
-    const reqs = await db.from('tickets').select('*').where('userid', user.userid);
-    return res.render('requests/refund', {reqs});
+    const reqs = await db.from('refund_requests').select('*').where('userid', user.userid)
+    return res.render('requests/refund', {reqs})
+  });
+
+  app.get('/tickets', async function(req, res) {
+    const user = await getUser(req);
+    var datedb = await db.from('tickets').select('tripdate').where('userid', user.userid).first()
+    if ((new Date()).valueOf() < datedb.tripdate.valueOf()) {
+      const reqs = await db.from('tickets').select('*').where('userid', user.userid).where('tripdate', datedb.tripdate);
+      return res.render('tickets', {reqs});
+    }
+    return res.render('tickets', user)
   });
 
   app.get('/manage/requests/seniors', async function(req, res) {
@@ -78,17 +88,17 @@ module.exports = function (app) {
   });
 
 
+  
+  app.get('/manage/zones', async function(req, res) {
+    const reqs =await db.from('zones').select('*');
+    return res.render('manage/zones.hjs',{reqs});
+    
+  });
+  
   app.get('/manage/stations/create', async function(req, res) {
     return res.render('manage/stations/create.hjs')
 
   });
-
-  app.get('/manage/zones', async function(req, res) {
-    const reqs =await db.from('zones').select('*');
-    return res.render('manage/zones.hjs',{reqs});
-
-  });
-
   app.get('/manage/stations', async function(req, res) {
     const reqs =await db.from('stations').select('*');
     return res.render('manage/stations/index.hjs',{reqs});

@@ -37,10 +37,15 @@
             <li><a href="subscriptions/purchase">subsription</a></li>
             <li><a href="tickets/purchase">tickets</a></li>
             {{/isNormal}}
-             {{#isSenior}}
+            {{#isSenior}}
             <li><a href="subscriptions/purchase">subsription</a></li>
             <li><a href="tickets/purchase">tickets</a></li>
             {{/isSenior}}
+            {{#isNormal}}
+            <li><a href="requests/senior">Request Senior</a></li>
+            <li><a href="requests/refund">Request Refund</a></li>
+            <li><a href="tickets">Tickets & Refund</a></li>
+            {{/isNormal}}
           </ul>
       </nav>
       </div>
@@ -48,15 +53,14 @@
       <div>
         <center>
           <a href="/resetPassword" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Reset Password</a>
-          {{#isNormal}}
-          <a href="requests/senior" class="btn btn-success btn-lg active" role="button" aria-pressed="true">Request Senior</a>
+          
+          {{#isSenior}}
           <a href="requests/refund" class="btn btn-success btn-lg active" role="button" aria-pressed="true">Request Refund</a>
-          {{/isNormal}}
+          {{/isSenior}}
           {{#isAdmin}}
           <a href="/manage/requests/seniors" class="btn btn-success btn-lg active" role="button" aria-pressed="true">Manage Senior Requests</a>
           <a href="/manage/requests/refunds" class="btn btn-danger btn-lg active" role="button" aria-pressed="true">Manage Refund Requests</a>
           {{/isAdmin}}
-
 
         </center>
       </div>
