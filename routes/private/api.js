@@ -342,7 +342,8 @@ module.exports = function (app) {
       subid: subId,
       tripdate: tripDate,
     };
-
+    console.log(tripDate)
+    
     try {
       const request = await db("tickets").insert(ticket).returning("*");
     } catch (e) {
@@ -384,6 +385,8 @@ module.exports = function (app) {
       .update({ nooftickets: sub[0].nooftickets - 1 });
     res.status(200).send("successfully added the ride!");
   });
+
+
   app.put("/api/v1/requests/senior/:requestId", async function (req, res) {
     //req: status of request
     //all requests with status/req == on-going change their status value to either accepted or rejected
