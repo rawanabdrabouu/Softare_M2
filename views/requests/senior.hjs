@@ -1,0 +1,73 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Request Senior</title>
+    <link rel="stylesheet" href="/styles/bootstrap.min.css" />
+    <link rel="stylesheet" href="/public/styles/style.css" />
+    <script src="/js/jquery-2.2.0.min.js" type="text/javascript"></script>
+    <script src="/js/bootstrap.min.js" type="text/javascript"></script>
+</head>
+
+<body>
+    <script>
+        $(document).ready(function () {
+            $("#submit").click(function () {
+                const
+                nationalId = $('#nationalID').val(); 
+                const data = { nationalId }; $.ajax({
+                    type: "POST", 
+                    url: '/api/v1/senior/request', 
+                    data, 
+                    success:
+                        function (serverResponse) {
+                            if (serverResponse) {
+                                alert(JSON.stringify(serverResponse));
+                            }
+                        }, 
+                    error:
+                        function (serverResponse) {
+                            if (serverResponse) {
+                                alert(`Error Register User:${serverResponse.responseText}`);
+                            }
+                        }
+                });
+            });
+        });
+    </script>
+    <div>
+        <nav class="navbar navbar-inverse" style="padding-left:130px;">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="/dashboard">Home</a></li>
+                <li><a href="/stations_example">Station</a></li>
+                <li><a href="/users">Users</a></li>
+                <li><a href="/users/add">Add Users</a></li>
+                <li><a href="/">Logout</a></li>
+            </ul>
+        </nav>
+    </div>
+    <br />
+    <h2 style="padding-left: 25px;padding-top:0px">Send a senior request</h2>
+    <br />
+    <div id="reqSeniorForm">
+        <form class="form-horizontal" style="width: 50%;padding-left: 25px">
+            <div class="form-group">
+                <label for="reqSenior" class="col-sm-2 control-label">National ID</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="nationalID" name="nationalID" placeholder="National ID"
+                        value="" />
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-10 col-sm-offset-2">
+                    <input id="submit" name="submit" type="button" value="Submit" class="btn btn-primary" />
+                </div>
+            </div>
+        </form>
+    </div>
+
+</body>
+
+</html>

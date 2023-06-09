@@ -9,6 +9,36 @@
     </head>
   </head>
   <body> 
+    <script>
+      $(document).ready(function(){
+        $("#submit").click(function() {
+          const email = $('#email').val();
+          const password = $('#password').val();
+
+          const data = {
+            email,
+            password,
+          };
+
+          $.ajax({
+            type: "POST",
+            url: '/api/v1/user/login',
+            data,
+            success: function(serverResponse) {
+              if(serverResponse) {
+                location.href = '/dashboard';
+              }
+            },
+            error: function(mm) {
+              console.log(mm)
+              if(mm) {
+                alert(`User login error: ${mm.responseText}`);
+              }            
+            }
+          });
+        });
+      });
+      </script>
     <div>
       <nav class="navbar navbar-inverse" style="padding-left:130px;">
           <ul class="nav navbar-nav">
@@ -43,34 +73,4 @@
   </form>
     </div>
   </body>
-</html>
-    <script>
-      $(document).ready(function(){
-        $("#submit").click(function() {
-          const email = $('#email').val();
-          const password = $('#password').val();
-
-          const data = {
-            email,
-            password,
-          };
-
-          $.ajax({
-            type: "POST",
-            url: '/api/v1/user/login',
-            data,
-            success: function(serverResponse) {
-              if(serverResponse) {
-                location.href = '/dashboard';
-              }
-            },
-            error: function(mm) {
-              console.log(mm)
-              if(mm) {
-                alert(`User login error: ${mm.responseText}`);
-              }            
-            }
-          });
-        });
-      });
-      </script>   
+</html>   

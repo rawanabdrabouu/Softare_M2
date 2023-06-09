@@ -15,7 +15,6 @@ const getUser = async function(req) {
     .innerJoin('roles', 'users.roleid', 'roles.id')
     .first();
   
-  console.log('user =>', user)
   user.isStudent = user.roleid === roles.student;
   user.isAdmin = user.roleid === roles.admin;
   user.isSenior = user.roleid === roles.senior;
@@ -27,7 +26,13 @@ module.exports = function(app) {
   // Register HTTP endpoint to render /users page
   app.get('/dashboard', async function(req, res) {
     const user = await getUser(req);
-    return res.render('dashboard', user);
+    return res.render('dashboard', {...user});
+  });
+
+  app.get('/resetPassword', async function(req, res) {
+    const user = await getUser(req);
+    console.log(user)
+    return res.render('resetPassword', user);
   });
 
   // Register HTTP endpoint to render /users page
@@ -48,5 +53,55 @@ module.exports = function(app) {
     return res.render('subsription', { subsription });
   });
 
-  
+  app.get('/requests/senior', async function(req, res) {
+    const user = await getUser(req);
+    return res.render('requests/senior', user);
+  });
+
+  app.get('/requests/refund', async function(req, res) {
+    const user = await getUser(req);
+    const reqs = await db.from('tickets').select('*').where('userid', user.userid);
+    return res.render('requests/refund', {reqs});
+  });
+
+  app.get('/manage/requests/seniors', async function(req, res) {
+    const reqs = await db.from('senior_requests').select('*').where('status', 'pending');
+    return res.render('manage/requests/seniors', {reqs});
+  });
+
+  app.get('/manage/requests/refunds', async function(req, res) {
+    const reqs = await db.from('refund_requests').select('*').where('status', 'pending');
+    return res.render('manage/requests/refunds', {reqs});
+  });
+
+
+  app.get('/manage/stations/create', async function(req, res) {
+    return res.render('manage/stations/create.hjs')
+
+  });
+
+  app.get('/manage/zones', async function(req, res) {
+    const reqs =await db.from('zones').select('*');
+    return res.render('manage/zones.hjs',{reqs});
+
+  });
+
+  app.get('/manage/stations', async function(req, res) {
+    const reqs =await db.from('stations').select('*');
+    return res.render('manage/stations/index.hjs',{reqs});
+
+  });
+
+  app.get('/manage/stations/edit/:stationId', async function(req, res) {
+    const stationId = req.params.stationId;
+
+    const station =await db.from('stations').where('id',stationId).first();
+    return res.render('manage/stations/edit.hjs',{station});
+
+  });
+
+
+
+
+
 };

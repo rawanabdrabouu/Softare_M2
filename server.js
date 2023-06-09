@@ -8,7 +8,7 @@ const publicViewRoutes = require('./routes/public/view');
 const privateViewRoutes = require('./routes/private/view');
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(__dirname, '/views'));
 app.set('view engine', 'hjs');
 // Config setup to allow our HTTP server to serve static files from our public directory
 app.use(express.static('public'));

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Senior Requests</title>
+    <link rel="stylesheet" href="/styles/bootstrap.min.css" />
+    <link rel="stylesheet" href="/public/styles/style.css" />
+    <script src="/js/jquery-2.2.0.min.js" type="text/javascript"></script>
+    <script src="/js/bootstrap.min.js" type="text/javascript"></script>
+</head>
+<body>
+    <script>
+        $(document).ready(function () {
+            $("#btnApprove").click(function () {
+                const seniorStatus = 'approve'
+                const userid =  $("#requestId").val()
+                const data = {
+                seniorStatus 
+                }; 
+                var x="/api/v1/requests/senior/";
+                var y=userid;
+                var url=x+y;
+                $.ajax({
+                    type: "PUT", 
+                    url: url, 
+                    data, 
+                    success:
+                        function (serverResponse) {
+                            if (serverResponse) {
+                                alert(JSON.stringify(serverResponse));
+                            }
+                        }, 
+                    error:
+                        function (errorResponse) {
+                            if (errorResponse) {
+                                alert(`Error Register User:${errorResponse.responseText}`);
+                            }
+                        }
+                });
+            });
+            $("#btnReject").click(function () {
+                const seniorStatus = 'reject'
+                const userid =  $("#requestId").val()
+                const data = {
+                seniorStatus 
+                }; 
+                var x="/api/v1/requests/senior/";
+                var y=userid;
+                var url=x+y;
+                $.ajax({
+                    type: "PUT", 
+                    url: url, 
+                    data, 
+                    success:
+                        function (serverResponse) {
+                            if (serverResponse) {
+                                alert(JSON.stringify(serverResponse));
+                            }
+                        }, 
+                    error:
+                        function (errorResponse) {
+                            if (errorResponse) {
+                                alert(`Error Register User:${errorResponse.responseText}`);
+                            }
+                        }
+                });
+            });
+        });
+    </script>
+    <div>
+        <nav class="navbar navbar-inverse" style="padding-left:130px;">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="/dashboard">Home</a></li>
+                <li><a href="/stations_example">Station</a></li>
+                <li><a href="/users">Users</a></li>
+                <li><a href="/users/add">Add Users</a></li>
+                <li><a href="/">Logout</a></li>
+            </ul>
+        </nav>
+    </div>
+    <br />
+    <h2 style="padding-left: 25px;padding-top:0px">Manage senior requests</h2>
+    <br />
+    <table class="table"style="margin-left: 20px;">
+        <thead>
+            <tr>
+            <th scope="col">id</th>
+            <th scope="col">Status</th>
+            <th scope="col">User id</th>
+            <th scope="col">National id</th>
+            </tr>
+            {{#reqs}}
+            <tr>
+                <td>{{id}}</td>
+                <td>{{status}}</td>
+                <td>{{userid}}</td>
+                <td>{{nationalid}}</td>
+                <td>
+                <input id="btnApprove" type="button" value="Approve request" class="btn btn-success">
+                <input id="btnReject" type="button" value="Reject request" class="btn btn-danger">
+                <input type="hidden" id="requestId" value={{id}}>
+                </td>
+            </tr>
+            {{/reqs}}
+        </thead>
+    </table>
+</body>
+</html>
