@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <head>
+        <link rel='stylesheet' href='/styles/bootstrap.min.css' />
+        <link rel='stylesheet' href='/styles/style.css' />
+        <script src="/js/jquery-2.2.0.min.js" type="text/javascript"></script>
+        <script src="/js/bootstrap.min.js" type="text/javascript"></script>
+    </head>
+   <script>
+        function deletetation(routeId) {
+
+            if (confirm("are you sure ?")) {
+                $.ajax({
+                    type: "DELETE",
+                    url: "/api/v1/route/" + routeId,
+                    success: function (serverResponse) {
+                        if (serverResponse) { alert('Successfully Deleted'); window.location.reload() }
+                    },
+                    error: function (errorResponse) {
+                        console.log(errorResponse)
+                        if (errorResponse) {
+                            alert(`Error deleting: ${errorResponse.responseText}`);
+                        }
+                    }
+                });
+            } else {
+                alert("Canceled");
+            }
+
+        }
+    </script>
+<body>
+
+    <div>
+        <nav class="navbar navbar-inverse" style="padding-left:130px;">
+            <ul class="nav navbar-nav">
+                <li><a href="/">Home</a></li>
+                <li><a href="/courses">Courses</a></li>
+                <li><a href="/users">Users</a></li>
+                <li><a href="/users/add">Add Users</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="center">
+        <h1>Delete And Update Route</h1>
+        <h2 style="padding-left: 25px;padding-top:0px">Route Edit</h2>
+        <br />
+
+
+        <table class="table" style="margin-left: 20px;">
+            <thead>
+                <tr>
+                   <th scope="col">Route ID</th>
+                    <th scope="col">Route Name</th>
+                    <th scope="col">From Route ID</th>
+                    <th scope="col">To Route ID</th>
+                    <th scope="col">edit</th>
+                    <th scope="col">Delete</th>
+
+                </tr>
+                {{#routes}}
+                <tr>
+                    <td>{{id}}</td>
+                    <td> {{routename}}</td>
+                    <td>{{fromstationid}}</td>
+                    <td>{{tostationid}}</td>
+                    <td>
+                    <a href="/manage/routes/edit/{{id}}" class="btn btn-success">Edit</a>
+                    </td>
+                    <td>
+                    <button class="btn btn-danger" type="button" onclick="deletetation({{id}})">Delete</button>
+                    </td>
+
+                </tr>
+                {{/routes}}
+            </thead>
+        </table>
+        <div>
+            <a href="/manage/routes/create" class="btn btn-success">create new route</a>
+        </div>
+    </div>
+    </div>
+</body>
+
+</html>
