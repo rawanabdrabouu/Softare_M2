@@ -89,22 +89,46 @@ module.exports = function (app) {
       const routes = await db
         .from("routes")
         .select("fromstationid", "tostationid");
-
-      let retult = getRouteStation(routes, originId, destinationId);
-      if (result.length <= 9) {
-        await db.from("zones").select("price").where("id", 1);
-      } else if (result.length <= 16) {
-        await db.from("zones").select("price").where("id", 2);
-      } else if (result.length > 16) {
-        await db
+      let result = getRouteStation(routes, originId, destinationId);
+      if (result.length <= 9) {//2
+        const price = await db
           .from("zones")
           .select("price")
-          .where("id", 3)
-          .then(function () {
-            return res.status(200).json({ message: "zone has been updated" });
+          .where("id", 1).first()
+          .then(function (price) {
+            if (!price) {
+              return res.status(400).send("error: pls enter price");
+            } else {
+              return res.status(200).json(price.price);
+            }
+          });
+      } else if (result.length <= 16) {//3
+        const price = await db
+          .from("zones")
+          .select("price")
+          .where("id", 2).first()
+          .then(function (price) {
+            if (!price) {
+              return res.status(400).send("error: pls enter price");
+            } else {
+              return res.status(200).json(price.price);
+            }
+          });
+      } else if (result.length > 16) {//4
+        const price = await db
+          .from("zones")
+          .select("price")
+          .where("id", 3).first()
+          .then(function (price) {
+            if (!price) {
+              return res.status(400).send("error: pls enter price");
+            } else {
+              return res.status(200).json(price.price);
+            }
           });
       } else {
-        return res.status(400).send("error: pls enter price");
+
+        return res.status(200).send("No route");
       }
     }
   );

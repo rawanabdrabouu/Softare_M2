@@ -12,5 +12,10 @@ module.exports = function(app) {
     return res.render('register', { stations });
   });
 
-  app
+  app.get('/price',async function(req,res){
+const stations=await db.select('*').from("stations")
+return res.render('price', { stations });
+
+
+  })
 };
