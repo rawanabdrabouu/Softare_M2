@@ -74,8 +74,8 @@ CREATE TABLE IF NOT EXISTS transactions
     id SERIAL NOT NULL,
     amount INTEGER NOT NULL,
     userid INTEGER NOT NULL,
-    purchasedIid text NOT NULL,
-    purchasetype text NOT NULL,
+    purchasedid text NOT NULL,
+    purchasetype varchar NOT NULL,
     FOREIGN KEY( userid ) REFERENCES users,
     CONSTRAINT transactions_pkey PRIMARY KEY (id)
 );
