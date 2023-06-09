@@ -11,7 +11,7 @@ const config = {
     port: 5432,
     user: 'postgres',
     password: 'Nokia1234',
-    database: 'baseDB',
+    database: 'M4',
   }
 };
 

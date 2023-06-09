@@ -78,17 +78,17 @@ module.exports = function(app) {
   });
 
 
+  
+  app.get('/manage/zones', async function(req, res) {
+    const reqs =await db.from('zones').select('*');
+    return res.render('manage/zones.hjs',{reqs});
+    
+  });
+  
   app.get('/manage/stations/create', async function(req, res) {
     return res.render('manage/stations/create.hjs')
 
   });
-
-  app.get('/manage/zones', async function(req, res) {
-    const reqs =await db.from('zones').select('*');
-    return res.render('manage/zones.hjs',{reqs});
-
-  });
-
   app.get('/manage/stations', async function(req, res) {
     const reqs =await db.from('stations').select('*');
     return res.render('manage/stations/index.hjs',{reqs});
