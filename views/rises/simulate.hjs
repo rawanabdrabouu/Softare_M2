@@ -31,7 +31,7 @@
                     success: function (serverResponse) {
                         if (serverResponse) {
                             alert('Successfully updated');
-                            location.href = '/manage/simulate';
+                            location.href = '/rises/simulate';
                         }
                     },
                     error: function (errorResponse) {

@@ -46,7 +46,7 @@
                 const data = {
                 refundStatus 
                 }; 
-                var x="/api/v1/requests/refunds/";
+                var x="/api/v1/requests/refunds";
                 var y=refundid;
                 var url=x+y;
                 $.ajax({

@@ -314,17 +314,17 @@ module.exports = function (app) {
 
   app.post("/api/v1/tickets/purchase/subscription", async function (req, res) {
     const user = await getUser(req);
-    const subId = req.body.subId;
+    const subId = req.body.subid;
     const origin = req.body.origin;
     const destination = req.body.destination;
-    const tripDate = req.body.tripDate;
+    const tripDate = req.body.tripdate;
     console.log(subId);
 
     const indications = {
       amount: 0,
       userid: user.userid,
       purchasedid: subId,
-      purchasetype: "subscription",
+      purchasetype: "subscription", 
     };
     try {
       const request = await db("transactions")
@@ -419,7 +419,7 @@ module.exports = function (app) {
         .where("userid", newSeniorId)
         .select("amount")
         .first();
-      // console.log('old amount is ', oldamount)
+      console.log('old amount is ', oldamount)
       await db
         .from("transactions")
         .where("userid", newSeniorId)

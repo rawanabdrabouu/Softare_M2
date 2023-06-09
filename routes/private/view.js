@@ -16,7 +16,7 @@ const getUser = async function (req) {
     .innerJoin('roles', 'users.roleid', 'roles.id')
     .first();
 console.log(user);
-  user.isStudent = user.roleid === roles.student;
+  user.isNormal = user.roleid === roles.user;
   user.isAdmin = user.roleid === roles.admin;
   user.isSenior = user.roleid === roles.senior;
 
@@ -35,7 +35,10 @@ module.exports = function (app) {
     const users = await db.select('*').from('users');
     return res.render('users', { users });
   });
-
+  app.get('/resetPassword', async function (req, res) {
+    const users = await db.select('*').from('users');
+    return res.render('resetPassword', { users });
+  });
   // Register HTTP endpoint to render /courses page
   app.get('/stations', async function (req, res) {
     const user = await getUser(req);
@@ -66,7 +69,6 @@ module.exports = function (app) {
     const reqs = await db.from('refund_requests').select('*').where('userid', user.userid)
     return res.render('requests/refund', {reqs})
   });
-
   app.get('/tickets', async function(req, res) {
     const user = await getUser(req);
     var datedb = await db.from('tickets').select('tripdate').where('userid', user.userid).first()
