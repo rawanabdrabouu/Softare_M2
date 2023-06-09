@@ -29,8 +29,6 @@
             <li><a href="/manage/zones">Update Zone Price </a></li>
             <li><a href="/manage/stations"> Manage Stations</a></li>
             <li><a href="/manage/routes"> Manage Routes</a></li>
-            <li><a href="/manage/routes/edit/:routeId"> Update Routes</a></li>
-            <li><a href="/manage/routes"> Update Routes</a></li>
              <li><a href="/rises/simulate">Rides</a></li>
             {{isAdmin}}
             <li><a href="/">Logout</a></li>

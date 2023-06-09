@@ -134,9 +134,7 @@ module.exports = function (app) {
   });
   app.get('/rises/simulate', async function(req, res) {
     const route = await db.from("rides").select("*");
-
     return res.render('rises/simulate.hjs',{route});
-
   });
 
 };
