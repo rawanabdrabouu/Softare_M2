@@ -58,12 +58,17 @@
         <form class="form-horizontal" style="width: 50%;">
             <div class="form-group">
                 <label for="Ride" class="col-sm-2 control-label">Orgin</label>
-                <label for="Ride" class="col-sm-2 control-label">Destination</label>
-                <label for="Ride" class="col-sm-2 control-label">Trip Date</label>
-                <div class="col-sm-10">
+                      <div class="col-sm-10"></div>
                     <input id ="originn" type="text" class="form-control" id="stationname" name="Orgin">
+                <label for="Ride" class="col-sm-2 control-label">Destination</label>
+                      <div class="col-sm-10"></div>
                     <input id = "destinationn"type="text" class="form-control" id="stationname" name="Destination">
+
+                <label for="Ride" class="col-sm-2 control-label">Trip Date</label>
+                      <div class="col-sm-10"></div>
                     <input id="tripDate"type="date" class="form-control" id="stationname" name="Trip Date">
+
+                <div class="col-sm-10">
                 </div>
             </div>
 

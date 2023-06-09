@@ -314,10 +314,10 @@ module.exports = function (app) {
 
   app.post("/api/v1/tickets/purchase/subscription", async function (req, res) {
     const user = await getUser(req);
-    const subId = req.body.subid;
+    const subId = req.body.subId;
     const origin = req.body.origin;
     const destination = req.body.destination;
-    const tripDate = req.body.tripdate;
+    const tripDate = req.body.tripDate;
     console.log(subId);
 
     const indications = {
