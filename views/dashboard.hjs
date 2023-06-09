@@ -29,6 +29,15 @@
             <li><a href="/manage/zones">Update Zone Price </a></li>
             <li><a href="/manage/stations"> Manage Stations</a></li>
             {{isAdmin}}
+            <li><a href="/">Logout</a></li>
+            {{#isNormal}}
+            <li><a href="subscriptions/purchase">subsription</a></li>
+            <li><a href="tickets/purchase">tickets</a></li>
+            {{/isNormal}}
+             {{#isSenior}}
+            <li><a href="subscriptions/purchase">subsription</a></li>
+            <li><a href="tickets/purchase">tickets</a></li>
+            {{/isSenior}}
           </ul>
       </nav>
       </div>

@@ -15,7 +15,8 @@ const getUser = async function(req) {
     .innerJoin('roles', 'users.roleid', 'roles.id')
     .first();
   
-  user.isStudent = user.roleid === roles.student;
+  console.log('user =>', user)
+  user.isNormal = user.roleid === roles.user;
   user.isAdmin = user.roleid === roles.admin;
   user.isSenior = user.roleid === roles.senior;
 
@@ -47,10 +48,12 @@ module.exports = function(app) {
     const stations = await db.select('*').from('stations');
     return res.render('stations_example', { ...user, stations });
   });
-  app.get('/subscriptions', async function(req, res) {
+
+  app.get('/subscriptions/purchase', async function(req, res) {
     const user = await getUser(req);
-    const stations = await db.select('*').from('subsription');
-    return res.render('subsription', { subsription });
+    const zones = await db.from('zones').select('*');
+    // const subs= await db.from(subsription).select("*").where("userid","=",user.userid);
+    return res.render('subscriptions/purchase.hjs', {user , zones});
   });
 
   app.get('/requests/senior', async function(req, res) {
@@ -102,6 +105,12 @@ module.exports = function(app) {
 
 
 
+
+
+  app.get('/tickets/purchase', async function(req, res) {
+    const user = await getUser(req);
+    return res.render('tickets/purchase.hjs', {user});
+  });
 
 
 };

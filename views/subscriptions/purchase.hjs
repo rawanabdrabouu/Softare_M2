@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+    <link rel='stylesheet' href='/styles/bootstrap.min.css' />
+    <link rel='stylesheet' href='/styles/style.css' />
+    <script src="/js/jquery-2.2.0.min.js" type="text/javascript"></script>
+    <script src="/js/bootstrap.min.js" type="text/javascript"></script>
+  </head>
+<body>
+    
+    <script>
+    $(document).ready(function () {
+      // Handle Registration Button Click
+      $("#submit").click(function () { 
+        const creditCardNumber= $('#creditCardNumber').val();
+        const holderName = $('#holderName').val();
+        const payedAmount= $('#payedAmount').val();
+        const subscType= $('#subscType').val();
+        const zoneId= $('#zoneId').val();
+      
+        const data = {
+          creditCardNumber,
+          holderName,
+          payedAmount,
+          subscType,
+          zoneId
+        };
+        console.log("subss",subscType);
+
+        $.ajax({
+          type: "POST",
+          url: "/api/v1/payment/subscription",
+          data,
+          success: function (serverResponse) {
+            if (serverResponse) {
+              alert('Successfully created');
+              
+            }
+          },
+          error: function (errorResponse) {
+            if (errorResponse) {
+              alert(`Error creatring subscription: ${errorResponse.responseText}`);
+            }
+          }
+        });
+      });
+    });
+  </script>
+   <div>
+      <nav class="navbar navbar-inverse" style="padding-left:130px;">
+          <ul class="nav navbar-nav">
+            <li><a href="/">Home</a></li>
+          </ul>
+      </nav>
+    </div>
+
+
+    <div class="center">
+      <h1>SUBSCRIPTION</h1>
+    </div>
+    <div style="padding-left: 500px">
+    <form class="form-horizontal" style="width: 50%;">
+      <div class="form-group">
+          <label for="creditCardNumber" class="col-sm-2 control-label">creditCardNumber</label>
+          <div class="col-sm-10">
+              <input type="text" class="form-control" id="creditCardNumber" name="creditCardNumber" placeholder="creditCardNumber" value="">
+          </div>
+      </div>
+      <div class="form-group">
+          <label for="holderName" class="col-sm-2 control-label">holder Name</label>
+          <div class="col-sm-10">
+              <input type="text" class="form-control" id="holderName" name="holderName" placeholder="holderName" value="">
+          </div>
+      </div>
+      <div class="form-group">
+          <label for="payedAmount" class="col-sm-2 control-label">payedAmount</label>
+          <div class="col-sm-10">
+              <input type="text" class="form-control" id="payedAmount" name="payedAmount" placeholder="payedAmount" value="">
+          </div>
+      </div>
+      <div class="form-group">
+          <label for="zoneId" class="col-sm-2 control-label">zoneId</label>
+          <div class="col-sm-10">
+              <input type="zoneId" class="form-control" id="zoneId" name="zoneId" placeholder="zoneId" value="">
+          </div>
+      </div>
+        <label for="dog-names">Subscription Types:</label> 
+    <select name="dog-names" id="subscType"> 
+        <option value="annual">Annual</option> 
+        <option value="quarterly">Quaerterly</option> 
+        <option value="monthly">Monthly</option>  
+    </select>
+    <div class="form-group">
+          <div class="col-sm-10 col-sm-offset-2">
+              <input id="submit" name="submit" type="button" value="submit" class="btn btn-primary">
+          </div>
+      </div>
+      
+
+   </form>
+
+    <div class="center">
+        <br />
+        <table class="table" style="margin-left: 20px;">
+            <thead>
+                <tr>
+                    <th scope="col">Zone ID</th>
+                    <th scope="col">zone type</th>
+                    <th scope="col">zone price</th>
+
+                </tr>
+                {{#zones}}
+                <tr>
+                    <td>{{id}}</td>
+                    <td>{{zonetype}}</td>
+                    <td>{{price}}</td>
+                    <td>
+                </tr>
+                {{/zones}}
+            </thead>
+        </table>
+  </div>
+</body>
+</html>

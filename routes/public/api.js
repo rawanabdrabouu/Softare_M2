@@ -82,8 +82,8 @@ module.exports = function (app) {
     }
   });
 
-  app.get("/api/v1/zone", async function (req, res) {
-    await db.select('*').from("zones")
+  app.get("/api/v1/zone", async function (req ,res) {
+      await db .select('*').from("zones")
   });
 }
 app.post(

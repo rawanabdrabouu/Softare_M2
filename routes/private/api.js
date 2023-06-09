@@ -118,6 +118,69 @@ module.exports = function (app) {
       .then(function () {
         res.status(200).json({ message: "station name updated" });
       });
+  })
+
+
+
+  app.put("/api/v1/station", async function (req, res) {
+    const nestationname = req.body.nestationname;
+    const stationid = req.body.stationid;
+
+    if ((!nestationname)) {
+      return res.status(500).send("error no data");
+    }
+    db.from('stations')
+      .where('id', '=', stationid)
+      .update({ stationname: nestationname })
+      .then(function (rowsUpdated) {
+        res.status(200).json({ message: 'station name updated' })
+      });
+  })
+
+
+  
+  app.post('/api/v1/payment/subscription', async function (req, res) { 
+    const user =  await getUser(req);
+    const creditCardNumber = req.body.creditCardNumber;
+    const holderName = req.body.holderName;
+    const payedAmount = req.body.payedAmount; 
+    const subscType = req.body.subscType;
+    const zoneId = req.body.zoneId;
+    const userId = user.userid;
+
+    
+
+    if ( !creditCardNumber || !holderName || !payedAmount || !subscType || !zoneId ) {
+      return res.status(400).send("Error: Missing required field");
+    }
+
+       
+    if(subscType == "annual"){
+      nooftickets=100;
+    }else if(subscType=="quarterly"){
+      nooftickets=50;
+    }else if(subscType=="monthly"){
+      nooftickets=10;
+    }
+
+    const subdata={
+      subtype:req.body.subscType,
+      zoneid:req.body.zoneId,
+      userid:user.userid,
+      nooftickets:nooftickets
+    }
+
+    console.log(subdata);
+
+    const sub= await db("subsription")
+    .where("subtype",'=',subscType)
+    .where("zoneid",'=',zoneId)
+    .where("nooftickets",'=',nooftickets)
+    .insert(subdata)
+    
+    return res.status(200).send("sub 100");
+      
+    
   });
 
   app.post("/api/v1/senior/request", async function (req, res) {
@@ -182,12 +245,44 @@ module.exports = function (app) {
     const payedAmount = req.body.payedAmount; 
     const origin = req.body.origin;
     const destination = req.body.destination;
-    const tripDate = user.tripDate;
+    const tripDate = req.body.tripDate;
     console.log(purchasedId)
+    
+    const ticket={
+      id:purchasedId,
+      origin : origin,
+      destination:destination,
+      userid :user.userid,
+      subid: null,
+      tripdate:tripDate
+    }
+
+    try {
+      const request = await db("tickets").insert(ticket).returning("*");
+    }catch (e) {
+      console.log(e.message);
+      return res.status(400).send("Could not store ticket");
+    }   
+
+    const indications = {
+      amount:payedAmount,
+      userid: user.userid,
+      purchasedid:purchasedId,
+      purchasetype: "ticket"
+    };
+   
+    try {
+      const request = await db("transactions").insert(indications).returning("*");
+    }catch (e) {
+      console.log(e.message);
+      return res.status(400).send("Could not store indications");
+    }    
+
+
     const purchasetype = await db.from("transactions")
       .select("purchasetype")
       .where("purchasedid", "=",purchasedId).first();
-      console.log(purchasetype);
+      console.log(purchasetype.purchasetype);
     
 
       
@@ -200,29 +295,13 @@ module.exports = function (app) {
       await db.from("transactions").where("purchasedid",'=',purchasedId).update({amount:payedAmount/2});
     }
 
-    
-
-    const indications = {
-      amount:payedAmount,
-      userid: user.userid,
-      purchasedid:purchasedId,
-      purchasetype: purchasetype.purchasetype
-    };
-   
-    try {
-      const request = await db("transactions").insert(indications).returning("*");
-    }catch (e) {
-      console.log(e.message);
-      return res.status(400).send("Could not store indications");
-    }   
-
     const adding_rides = {
       status:"upcoming",
-      origin : req.body.origin,
-      destination : req.body.destination,
+      origin : origin,
+      destination :destination,
       userid: user.userid,
-      ticketid: req.body.purchasedId,
-      tripdate: req.body.tripDate
+      ticketid: purchasedId,
+      tripdate: tripDate
     };
     try {
       const request = await db("rides").insert(adding_rides).returning("*");
@@ -245,22 +324,11 @@ module.exports = function (app) {
     console.log(subId)
 
 
-    const purchasetype = await db.from("transactions")
-      .where("purchasedid","=", subId);
-      
-
-      console.log(purchasetype[0].purchasetype)
-     if(purchasetype[0].purchasetype!=='subscription')  {
-        return res.status(400).send("Could not pay online");
-      }
-     
-
-
     const indications = {
       amount:0,
       userid: user.userid,
       purchasedid: subId,
-      purchasetype: purchasetype[0].purchasetype
+      purchasetype: "subscription"
     };
     try {
       const request = await db("transactions").insert(indications).returning("*");
@@ -269,6 +337,35 @@ module.exports = function (app) {
       console.log(e.message);
       return res.status(400).send("Could not store indications");
     } 
+
+    
+
+    const ticket={
+      origin : origin,
+      destination:destination,
+      userid :user.userid,
+      subid: subId,
+      tripdate:tripDate
+    }
+
+    try {
+      const request = await db("tickets").insert(ticket).returning("*");
+    }catch (e) {
+      console.log(e.message);
+      return res.status(400).send("Could not store ticket");
+    } 
+
+
+    const purchasetype = await db.from("transactions")
+      .where("purchasedid","=", subId);
+      
+
+      console.log(purchasetype.purchasetype)
+     if(purchasetype[0].purchasetype!=='subscription')  {
+        return res.status(400).send("Could not pay online");
+      }
+   
+    
     const adding_rides = {
       status:"upcoming",
       origin : origin,
@@ -293,6 +390,7 @@ module.exports = function (app) {
     const subb= await db.from("subsription")
      .where("id","=", subId).update ({nooftickets:sub[0].nooftickets-1
         }); 
+        res.status(200).send("successfully added the ride!");    
 
     
   });
