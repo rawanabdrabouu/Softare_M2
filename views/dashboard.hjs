@@ -31,6 +31,7 @@
             <li><a href="/manage/routes"> Manage Routes</a></li>
             <li><a href="/manage/routes/edit/:routeId"> Update Routes</a></li>
             <li><a href="/manage/routes"> Update Routes</a></li>
+             <li><a href="/rises/simulate">Rides</a></li>
             {{isAdmin}}
             <li><a href="/">Logout</a></li>
             {{#isNormal}}
@@ -44,7 +45,8 @@
             {{#isNormal}}
             <li><a href="requests/senior">Request Senior</a></li>
             <li><a href="requests/refund">Request Refund</a></li>
-            <li><a href="tickets">Tickets & Refund</a></li>
+            <li><a href="tickets">Tickets and Refund</a></li>
+            <li><a href="/rises/simulate">Rides</a></li>
             {{/isNormal}}
           </ul>
       </nav>

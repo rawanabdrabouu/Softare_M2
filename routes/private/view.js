@@ -132,6 +132,11 @@ module.exports = function (app) {
     const user = await getUser(req);
     return res.render('tickets/purchase.hjs', {user});
   });
+  app.get('/rises/simulate', async function(req, res) {
+    const route = await db.from("rides").select("*");
 
+    return res.render('rises/simulate.hjs',{route});
+
+  });
 
 };

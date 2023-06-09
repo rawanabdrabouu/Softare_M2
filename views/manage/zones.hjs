@@ -54,7 +54,6 @@
         <h1>updated</h1>
         <h2 style="padding-left: 25px;padding-top:0px">Update Zone price</h2>
         <br />
-        <a href="/stations/create" class="btn btn-danger pull-leftpl-2">create new station</a>
         <table class="table" style="margin-left: 20px;">
             <thead>
                 <tr>
@@ -71,7 +70,7 @@
                         <input type="text" class="form-control price" name="price" placeholder="$0" value="{{price}}"  onchange="updateZone(this,{{id}})" />
                     </td>
                     <td>
-                        <a href="/stations/{{id}}" class="btn btn-danger pull-leftpl-2">create new station</a>
+                        <a href="/stations/{{id}}" class="btn btn-success pull-leftpl-2">Update Price</a>
                     </td>
                 </tr>
                 {{/reqs}}
