@@ -11,4 +11,6 @@ module.exports = function(app) {
     const stations = await db.select('*').from('stations');
     return res.render('register', { stations });
   });
+
+  app
 };

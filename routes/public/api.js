@@ -3,8 +3,7 @@ const { v4 } = require("uuid");
 const db = require("../../connectors/db");
 const roles = require("../../constants/roles");
 module.exports = function (app) {
-app.post("/api/v1/user", async function (req, res) {
-
+  app.post("/api/v1/user", async function (req, res) {
     // Check if user already exists in the system
     const userExists = await db
       .select("*")
@@ -82,6 +81,73 @@ app.post("/api/v1/user", async function (req, res) {
       return res.status(400).send("Could not register user");
     }
   });
+  app.post(
+    "/api/v1/tickets/price/:originId/:destinationId",
+    async function (req, res) {
+      const originId = req.params.originId;
+      const destinationId = req.params.destinationId;
+      const routes = await db
+        .from("routes")
+        .select("fromstationid", "tostationid");
 
+      let retult = getRouteStation(routes, originId, destinationId);
+      if (result.length <= 9) {
+        await db.from("zones").select("price").where("id", 1);
+      } else if (result.length <= 16) {
+        await db.from("zones").select("price").where("id", 2);
+      } else if (result.length > 16) {
+        await db
+          .from("zones")
+          .select("price")
+          .where("id", 3)
+          .then(function () {
+            return res.status(200).json({ message: "zone has been updated" });
+          });
+      } else {
+        return res.status(400).send("error: pls enter price");
+      }
+    }
+  );
 
-}
+  function getRouteStation(routes, from, to) {
+    let originId = parseInt(from);
+    let destinationId = parseInt(to);
+
+    let visited = new Set();
+    visited.add(originId);
+    let shortestRoute = [];
+    DFS(originId, destinationId, [], visited);
+    return shortestRoute;
+
+    function DFS(currStationID, destinationId, inroute, visited) {
+      if (currStationID === destinationId) {
+        if (
+          shortestRoute.length === 0 ||
+          shortestRoute.length > inroute.length
+        ) {
+          shortestRoute = [...inroute];
+        }
+        return;
+      }
+
+      let nextStations = routes
+        .map((st) =>
+          st.fromstationid === currStationID && !visited.has(st.tostationid)
+            ? st
+            : undefined
+        )
+        .filter((st) => st !== undefined);
+
+      for (let nextStation of nextStations) {
+        visited.add(nextStation.tostationid);
+        DFS(
+          nextStation.tostationid,
+          destinationId,
+          [...inroute, nextStation],
+          visited
+        );
+        visited.delete(nextStation.tostationid);
+      }
+    }
+  }
+};
