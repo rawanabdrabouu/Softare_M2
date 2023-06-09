@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -10,25 +11,24 @@
     <script src="/js/jquery-2.2.0.min.js" type="text/javascript"></script>
     <script src="/js/bootstrap.min.js" type="text/javascript"></script>
 </head>
+
 <body>
     <script>
-        $(document).ready(function () {
-            $("#btnRefund").click(function () {
-                const ticketId = $('#ticketId').val(); 
-                const data = { }; 
+            function refundTicket (ticketId) {
+                const data = {};
                 var x = '/api/v1/refund/'
                 var y = ticketId
                 var url = x + y
                 $.ajax({
-                    type: "POST", 
-                    url: url, 
-                    data, 
+                    type: "POST",
+                    url: url,
+                    data,
                     success:
                         function (serverResponse) {
                             if (serverResponse) {
                                 alert(JSON.stringify(serverResponse));
                             }
-                        }, 
+                        },
                     error:
                         function (serverResponse) {
                             if (serverResponse) {
@@ -36,8 +36,7 @@
                             }
                         }
                 });
-            });
-        });
+            }
     </script>
     <div>
         <nav class="navbar navbar-inverse" style="padding-left:130px;">
@@ -45,7 +44,7 @@
                 <li class="active"><a href="/dashboard">Home</a></li>
                 <li><a href="/stations_example">Station</a></li>
                 <li><a href="/users">Users</a></li>
-                <li><a href="/users/add">Add Users</a></li>
+                
                 <li><a href="/">Logout</a></li>
             </ul>
         </nav>
@@ -53,15 +52,15 @@
     <br />
     <h2 style="padding-left: 25px;padding-top:0px">Send a refund request</h2>
     <br />
-    <table class="table"style="margin-left: 20px;">
+    <table class="table" style="margin-left: 20px;">
         <thead>
             <tr>
-            <th scope="col">id</th>
-            <th scope="col">origin</th>
-            <th scope="col">destination</th>
-            <th scope="col">User id</th>
-            <th scope="col">Subscription id</th>
-            <th scope="col">Trip date</th>
+                <th scope="col">id</th>
+                <th scope="col">origin</th>
+                <th scope="col">destination</th>
+                <th scope="col">User id</th>
+                <th scope="col">Subscription id</th>
+                <th scope="col">Trip date</th>
 
             </tr>
             {{#reqs}}
@@ -73,12 +72,13 @@
                 <td>{{subid}}</td>
                 <td>{{tripdate}}</td>
                 <td>
-                <input id="btnRefund" type="button" value="Refund ticket" class="btn btn-success">
-                <input type="hidden" id="ticketId" value={{id}}>
+                    <button id="btnReject" type="button" class="btn btn-success" onclick="refundTicket({{id}})">Refund ticket</button>
+
                 </td>
             </tr>
             {{/reqs}}
         </thead>
     </table>
 </body>
+
 </html>

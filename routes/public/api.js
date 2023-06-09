@@ -25,7 +25,6 @@ module.exports = function (app) {
 
       return res.status(200).json(user);
     } catch (e) {
-      console.log(e.message);
       return res.status(400).send("Could not register user");
     }
   });
@@ -77,7 +76,6 @@ module.exports = function (app) {
         .status(200)
         .send("login successful");
     } catch (e) {
-      console.log(e.message);
       return res.status(400).send("Could not register user");
     }
   });

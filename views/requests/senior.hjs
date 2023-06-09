@@ -43,7 +43,6 @@
                 <li class="active"><a href="/dashboard">Home</a></li>
                 <li><a href="/stations_example">Station</a></li>
                 <li><a href="/users">Users</a></li>
-                <li><a href="/users/add">Add Users</a></li>
                 <li><a href="/">Logout</a></li>
             </ul>
         </nav>

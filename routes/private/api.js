@@ -32,12 +32,10 @@ module.exports = function (app) {
     try {
       const user = await getUser(req);
       // const {userid}=req.body
-      console.log("hiiiiiiiiiii");
       const users = await db.select("*").from("users");
 
       return res.status(200).json(users);
     } catch (e) {
-      console.log(e.message);
       return res.status(400).send("Could not get users");
     }
   });
@@ -167,7 +165,6 @@ module.exports = function (app) {
       nooftickets: nooftickets,
     };
 
-    console.log(subdata);
 
     const sub = await db("subsription")
       .where("subtype", "=", subscType)
@@ -227,24 +224,20 @@ module.exports = function (app) {
 
       return res.status(200).send("request saved");
     } catch (e) {
-      console.log(e.message);
       return res.status(400).send("Could not store the request");
     }
   });
 
   app.post("/api/v1/payment/ticket", async function (req, res) {
     const user = await getUser(req);
-    const purchasedId = req.body.purchasedId;
     const creditCardNumber = req.body.creditCardNumber;
     const holderName = req.body.holderName;
     const payedAmount = req.body.payedAmount;
     const origin = req.body.origin;
     const destination = req.body.destination;
     const tripDate = req.body.tripDate;
-    console.log(purchasedId);
 
     const ticket = {
-      id: purchasedId,
       origin: origin,
       destination: destination,
       userid: user.userid,
@@ -252,64 +245,58 @@ module.exports = function (app) {
       tripdate: tripDate,
     };
 
-    try {
-      const request = await db("tickets").insert(ticket).returning("*");
-    } catch (e) {
-      console.log(e.message);
-      return res.status(400).send("Could not store ticket");
-    }
+    const tickets = await db("tickets").insert(ticket).returning("*");
+    if (tickets) {
+      const indications = {
+        amount: payedAmount,
+        userid: user.userid,
+        purchasedid: tickets[0].id,
+        purchasetype: "ticket",
+      };
 
-    const indications = {
-      amount: payedAmount,
-      userid: user.userid,
-      purchasedid: purchasedId,
-      purchasetype: "ticket",
-    };
-
-    try {
-      const request = await db("transactions")
+      const transactions = await db("transactions")
         .insert(indications)
         .returning("*");
-    } catch (e) {
-      console.log(e.message);
-      return res.status(400).send("Could not store indications");
-    }
+      if (!transactions) {
+        return res.status(400).send("Could not store indications");
+      }
 
-    const purchasetype = await db
-      .from("transactions")
-      .select("purchasetype")
-      .where("purchasedid", "=", purchasedId)
-      .first();
-    console.log(purchasetype.purchasetype);
-
-    if (purchasetype.purchasetype == "subscription") {
-      return res.status(400).send("Could not pay online");
-    }
-
-    if (user.isSenior) {
-      const oldamount = payedAmount;
-      await db
+      const purchasetype = await db
         .from("transactions")
-        .where("purchasedid", "=", purchasedId)
-        .update({ amount: payedAmount / 2 });
-    }
+        .select("purchasetype")
+        .where("purchasedid", "=", tickets[0].id)
+        .first();
 
-    const adding_rides = {
-      status: "upcoming",
-      origin: origin,
-      destination: destination,
-      userid: user.userid,
-      ticketid: purchasedId,
-      tripdate: tripDate,
-    };
-    try {
-      const request = await db("rides").insert(adding_rides).returning("*");
-    } catch (e) {
-      console.log(e.message);
-      return res.status(400).send("Could not store rides");
-    }
+      if (purchasetype.purchasetype == "subscription") {
+        return res.status(400).send("Could not pay online");
+      }
 
-    return res.status(200).send("SUCCESSFULLY ADDED A RIDE");
+      if (user.isSenior) {
+        const oldamount = payedAmount;
+        await db
+          .from("transactions")
+          .where("purchasedid", "=", tickets[0].id)
+          .update({ amount: payedAmount / 2 });
+      }
+
+      const adding_rides = {
+        status: "upcoming",
+        origin: origin,
+        destination: destination,
+        userid: user.userid,
+        ticketid: tickets[0].id,
+        tripdate: tripDate,
+      };
+      try {
+        const request = await db("rides").insert(adding_rides).returning("*");
+      } catch (e) {
+        return res.status(400).send("Could not store rides");
+      }
+
+      return res.status(200).send("SUCCESSFULLY ADDED A RIDE");
+    } else {
+      return res.status(400).send("Could not store ticket");
+    }
   });
 
   app.post("/api/v1/tickets/purchase/subscription", async function (req, res) {
@@ -318,20 +305,18 @@ module.exports = function (app) {
     const origin = req.body.origin;
     const destination = req.body.destination;
     const tripDate = req.body.tripDate;
-    console.log(subId);
 
     const indications = {
       amount: 0,
       userid: user.userid,
       purchasedid: subId,
-      purchasetype: "subscription", 
+      purchasetype: "subscription",
     };
     try {
       const request = await db("transactions")
         .insert(indications)
         .returning("*");
     } catch (e) {
-      console.log(e.message);
       return res.status(400).send("Could not store indications");
     }
 
@@ -342,12 +327,10 @@ module.exports = function (app) {
       subid: subId,
       tripdate: tripDate,
     };
-    console.log(tripDate)
-    
+
     try {
       const request = await db("tickets").insert(ticket).returning("*");
     } catch (e) {
-      console.log(e.message);
       return res.status(400).send("Could not store ticket");
     }
 
@@ -355,7 +338,6 @@ module.exports = function (app) {
       .from("transactions")
       .where("purchasedid", "=", subId);
 
-    console.log(purchasetype.purchasetype);
     if (purchasetype[0].purchasetype !== "subscription") {
       return res.status(400).send("Could not pay online");
     }
@@ -372,12 +354,10 @@ module.exports = function (app) {
       const request = await db("rides").insert(adding_rides).returning("*");
       res.status(200).send("successfully added the ride!");
     } catch (e) {
-      console.log(e.message);
       res.status(400).send("Could not store rides");
     }
 
     const sub = await db.from("subsription").where("id", "=", subId);
-    console.log(sub[0].nooftickets);
 
     const subb = await db
       .from("subsription")
@@ -385,7 +365,6 @@ module.exports = function (app) {
       .update({ nooftickets: sub[0].nooftickets - 1 });
     res.status(200).send("successfully added the ride!");
   });
-
 
   app.put("/api/v1/requests/senior/:requestId", async function (req, res) {
     //req: status of request
@@ -422,7 +401,6 @@ module.exports = function (app) {
         .where("userid", newSeniorId)
         .select("amount")
         .first();
-      console.log('old amount is ', oldamount)
       await db
         .from("transactions")
         .where("userid", newSeniorId)
@@ -459,6 +437,7 @@ module.exports = function (app) {
 
     //check if user sent refund request for the same ticket
     const ticketId = req.params.ticketId;
+
     const refRequestExists = await db
       .select("*")
       .from("refund_requests")
@@ -483,7 +462,7 @@ module.exports = function (app) {
     var myDay = myDate.getDay();
     var myYear = myDate.getFullYear();
     var myDate = new Date(myYear, myMonth, myDay);
-    if (myDate < tripDate) {
+    if (myDate > tripDate) {
       return res.status(400).send("ticket isn't future dated");
     }
     //transactions table to get refund amount
@@ -495,15 +474,16 @@ module.exports = function (app) {
     if (payPlanStr.includes("subscription")) {
       var amountPayed = 0;
     } else {
-      var amountPayed = db
+      var amountPayed = await db
         .from("transactions")
         .select("amount")
-        .where("userid", currentUserId);
+        .where("purchasedid", ticketId)
+        .first();
     }
     const newRefRequest = {
       status: "pending",
       userid: currentUserId,
-      refundamount: amountPayed,
+      refundamount: amountPayed.amount,
       ticketid: ticketId,
     };
     try {
@@ -513,7 +493,6 @@ module.exports = function (app) {
 
       return res.status(200).send("Request saved");
     } catch (e) {
-      console.log(e.message);
       return res.status(400).send("Could not store the request");
     }
   });
@@ -571,7 +550,7 @@ module.exports = function (app) {
         await db
           .from("transactions")
           .del()
-          .where("purcchaseid", ticketId.ticketid);
+          .where("purchasedid", ticketId.ticketid);
       }
       //ADD 7TET ADDING TICKETS OF SUBSCRIPTION IF USER IS SUBSCRIBED LAW LAA YB2A 5ALAS
       if (payPlanStr.includes("subscription")) {
@@ -611,7 +590,6 @@ module.exports = function (app) {
   });
 
   app.delete("/api/v1/route/:routeId", async function (req, res) {
-
     const routeId = req.params.routeId;
     const fromstation = await db
       .from("routes")
@@ -775,9 +753,7 @@ module.exports = function (app) {
               .select("*")
               .from("stationroutes")
               .where("stationid", st.tostationid);
-            console.log(stationroutes);
             if (stationroutes.length === 2) {
-              console.log(stationroutes);
             }
           });
         }
@@ -855,21 +831,22 @@ module.exports = function (app) {
     }
   }
   app.post("/api/v1/route", async function (req, res) {
-
     newStationId = req.body.newStationId;
 
     connectedStationId = req.body.connectedStationId;
 
     routeName = req.body.routeName;
 
-
     if (!newStationId || !connectedStationId || !routeName) {
       return res.status(400).send("Missing Required Parameters");
     }
-    console.log(newStationId, connectedStationId, routeName)
     // try {
     const route = await db("routes")
-      .insert({ routename: routeName, fromstationid: connectedStationId, tostationid: newStationId })
+      .insert({
+        routename: routeName,
+        fromstationid: connectedStationId,
+        tostationid: newStationId,
+      })
       .returning("*");
 
     return res.status(200).json(route);
@@ -878,7 +855,6 @@ module.exports = function (app) {
     //  }
   });
   app.put("/api/v1/route/:routeId", async function (req, res) {
-
     try {
       const routeName = req.body.routeName;
 
@@ -902,28 +878,26 @@ module.exports = function (app) {
       console.error(err);
       return res.status(500).json({ error: "Internal server error" });
     }
-
   });
-  app.put('/api/v1/ride/simulate', async function (req, res) {
-    //console.log("-----")
+  app.put("/api/v1/ride/simulate", async function (req, res) {
     const user = await getUser(req);
     const originn = req.body.originn;
     const destinationn = req.body.destinationn;
     const tripDate = req.body.tripDate;
 
     if (!originn || !destinationn || !tripDate) {
-      return res.status(400).send('Missing Required Parameters');
+      return res.status(400).send("Missing Required Parameters");
     }
 
-    await db.from("rides").where({
-      userid: user.id,
-      origin: originn,
-      destination: destinationn,
-      tripdate: tripDate
-    }).update(
-      { status: "completed" })
-    return res.status(200).send('Ride Can Start');
-  }
-
-  );
+    await db
+      .from("rides")
+      .where({
+        userid: user.id,
+        origin: originn,
+        destination: destinationn,
+        tripdate: tripDate,
+      })
+      .update({ status: "completed" });
+    return res.status(200).send("Ride Can Start");
+  });
 };

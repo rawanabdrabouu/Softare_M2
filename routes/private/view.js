@@ -8,14 +8,12 @@ const getUser = async function (req) {
     return res.status(301).redirect('/');
   }
 
-  console.log(sessionToken);
   const user = await db.select('*')
     .from('sessions')
     .where('token', sessionToken)
     .innerJoin('users', 'sessions.userid', 'users.id')
     .innerJoin('roles', 'users.roleid', 'roles.id')
     .first();
-console.log(user);
   user.isNormal = user.roleid === roles.user;
   user.isAdmin = user.roleid === roles.admin;
   user.isSenior = user.roleid === roles.senior;
@@ -48,7 +46,6 @@ module.exports = function (app) {
   
   app.get('/manage/routes', async function (req, res) {
     const routes = await db.from("routes").select("*");
-    console.log(routes);
     return res.render('manage/routes/index.hjs', {routes});
   })
 
@@ -132,7 +129,8 @@ module.exports = function (app) {
 
   app.get('/tickets/purchase', async function(req, res) {
     const user = await getUser(req);
-    return res.render('tickets/purchase.hjs', {user});
+    const stations = await db.from("stations").select("*")
+       return res.render('tickets/purchase.hjs', {user,stations});
   });
   app.get('/rises/simulate', async function(req, res) {
     const route = await db.from("rides").select("*");

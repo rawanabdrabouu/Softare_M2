@@ -25,7 +25,6 @@
           <li class="active"><a href="/dashboard">Home</a></li>
           {{#isAdmin}}
           <li><a href="/users">Users</a></li>
-          <li><a href="/users/add">Add Users</a></li>
           <li><a href="/manage/zones">Update Zone Price </a></li>
           <li><a href="/manage/stations"> Manage Stations</a></li>
           <li><a href="/manage/routes"> Manage Routes</a></li>
