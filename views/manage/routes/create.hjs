@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Routes</title>
+    <link rel='stylesheet' href='/styles/bootstrap.min.css' />
+    <link rel='stylesheet' href='/styles/style.css' />
+    <script src="/js/jquery-2.2.0.min.js" type="text/javascript"></script>
+    <script src="/js/bootstrap.min.js" type="text/javascript"></script>
+</head>
+
+<body>
+    <script>
+        $(document).ready(function () {
+            $("#CreateButton").click(function () {
+
+                const newStationId = $('#newstationid').val();
+                const connectedStationId = $('#fromstationid').val();
+                const routeName = $('#routename').val();
+
+                const data = {
+
+                    newStationId,
+                    connectedStationId,
+                    routeName
+                };
+                $.ajax({
+                    type: "POST",
+                    url: "/api/v1/route", data,
+                    success: function (serverResponse) {
+                        if (serverResponse) {
+                            alert('Successfully created');
+                            location.href = '/manage/routes/create';
+                        }
+                    },
+                    error: function (errorResponse) {
+                        if (errorResponse) {
+                            alert(`Error creatring routes: ${errorResponse.responseText}`);
+                        }
+                    }
+                })
+            })
+        })
+    </script>
+    <div>
+        <nav class="navbar navbar-inverse" style="padding-left:130px;">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="/">Home</a></li>
+            </ul>
+        </nav>   
+    </div>
+    <div class="center">
+
+        <h1>Create Route</h1>
+
+    </div>
+    <div class="input-group ">
+        <div style="padding-left: 500px">
+
+            <form class="form-horizontal" style="width: 50%;">
+
+                <div class="form-group">
+                    <input id="newstationid" type="text" class="form-control" placeholder="From Statiion ID">
+                    <input id="fromstationid" type="text" class="form-control" placeholder="To Station ID">
+                    <input id="routename" type="text" class="form-control" placeholder="Route Name">
+                    <input id="CreateButton" name="Create" type="button" value="Create" class="btn btn-primary">
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>
