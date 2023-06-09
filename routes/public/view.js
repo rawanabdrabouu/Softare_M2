@@ -12,14 +12,9 @@ module.exports = function (app) {
     return res.render('register', { stations });
   });
 
-  app.get('/views/zones', async function (req, res) {
-    const zones = await db.from('zones').select('*');
-    return res.render('zones.hjs', { zones });
-  });
+
   app.get('/price', async function (req, res) {
     const stations = await db.select('*').from("stations")
     return res.render('price', { stations });
-
-
   })
 };
