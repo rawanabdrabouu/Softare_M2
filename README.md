@@ -1,3 +1,2 @@
 ﻿# SE_starter_code
- Run npm install to install all dependences 
- npm start to run project
+This project is a simple project for metro station with a greate algrothim ,it is a uni project 
