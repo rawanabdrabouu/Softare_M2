@@ -165,7 +165,6 @@ module.exports = function (app) {
       nooftickets: nooftickets,
     };
 
-
     const sub = await db("subsription")
       .where("subtype", "=", subscType)
       .where("zoneid", "=", zoneId)
@@ -471,14 +470,16 @@ module.exports = function (app) {
       .select("purchasetype")
       .where("userid", currentUserId);
     const payPlanStr = payPlan.toString();
+    var amountPayed;
     if (payPlanStr.includes("subscription")) {
-      var amountPayed = 0;
+      amountPayed = 0;
     } else {
-      var amountPayed = await db
+      amountPayed = await db
         .from("transactions")
         .select("amount")
         .where("purchasedid", ticketId)
         .first();
+      console.log(amountPayed);
     }
     const newRefRequest = {
       status: "pending",
@@ -747,15 +748,46 @@ module.exports = function (app) {
           .from("routes")
           .where("fromstationid", station.id);
 
+        var newStationtobemeddel = null;
         if (fromstations && fromstations.length > 0) {
-          fromstations.forEach(async (st) => {
-            const stationroutes = await db
-              .select("*")
-              .from("stationroutes")
-              .where("stationid", st.tostationid);
-            if (stationroutes.length === 2) {
-            }
-          });
+          const replaceStation = fromstations[0];
+          newStationtobemeddel = replaceStation.tostationid;
+          for (let i = 1; i < fromstations.length; i++) {
+            const st = fromstations[i];
+
+            const r1data = {
+              routename: "hi" + replaceStation.tostationid + st.tostationid,
+              fromstationid: replaceStation.tostationid,
+              tostationid: st.tostationid,
+            };
+            console.log(r1data);
+            const r1 = await db("routes").insert(r1data).returning("id"); //1 -3
+
+            const r2data = {
+              routename: "hi" + st.tostationid + replaceStation.tostationid,
+              fromstationid: st.tostationid,
+              tostationid: replaceStation.tostationid,
+            };
+            console.log(r2data);
+
+            const r2 = await db("routes").insert(r2data).returning("id"); // 3-1
+
+            const stationroute = await db("stationroutes")
+              .insert([
+                { stationid: st.id, routeid: r1 },
+                { stationid: replaceStation.tostationid, routeid: r1 },
+                { stationid: st.id, routeid: r2 },
+                { stationid: replaceStation.tostationid, routeid: r2 },
+              ])
+              .returning("*")
+              .toString();
+          }
+          await db.from("stations").where("id", stationID).del();
+          await db
+            .from("stations")
+            .where("id", newStationtobemeddel)
+            .update({ stationtype: "transfer" });
+          return res.status(200).send("deleted");
         }
       }
     }

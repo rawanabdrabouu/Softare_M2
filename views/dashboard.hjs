@@ -33,12 +33,14 @@
           {{/isAdmin}}
 
           {{#isNormal}}
-          <li><a href="/middleware">subsription</a></li>
           <li><a href="/tickets/purchase">tickets</a></li>
           <li><a href="/rises/simulate">Rides</a></li>
           <li><a href="requests/senior">Request Senior</a></li>
           <li><a href="/requests/refund">Request Refund</a></li>
+          <li><a href="/tickets/purchase">tickets</a></li>
           <li><a href="/tickets">Tickets and Refund</a></li>
+          <li><a href="/subscriptions/purchase">subsription</a></li>
+
           <li><a href="/price">Check Price </a></li>
           <li><a href="/">Logout</a></li>
           {{/isNormal}}
@@ -47,8 +49,9 @@
           <li><a href="/requests/refund">Request Refund</a></li>
           <li><a href="tickets">Tickets and Refund</a></li>
           <li><a href="/rises/simulate">Rides</a></li>
-          <li><a href="/subscriptions/purchase">subsription</a></li>
           <li><a href="/tickets/purchase">tickets</a></li>
+
+          <li><a href="/subscriptions/purchase">subsription</a></li>
           <li><a href="/price">Check Price </a></li>
           <li><a href="/">Logout</a></li>
           {{/isSenior}}

@@ -80,8 +80,9 @@ module.exports = function (app) {
     }
   });
 
-  app.get("/api/v1/zone", async function (req, res) {
-    await db.select("*").from("zones");
+    app.get("/api/v1/zone", async function (req, res) {
+      const data = await db.select("*").from("zones");
+      return res.status(200).json(data);
   });
   app.post(
     "/api/v1/tickets/price/:originId/:destinationId",
@@ -92,7 +93,7 @@ module.exports = function (app) {
         .from("routes")
         .select("fromstationid", "tostationid");
       let result = getRouteStation(routes, originId, destinationId);
-      if (result.length <= 9) {
+      if (result.length < 9) {
         //2
         const price = await db
           .from("zones")
@@ -106,7 +107,7 @@ module.exports = function (app) {
               return res.status(200).json(price.price);
             }
           });
-      } else if (result.length <= 16) {
+      } else if (result.length >= 9) {
         //3
         const price = await db
           .from("zones")
@@ -121,24 +122,25 @@ module.exports = function (app) {
             }
           });
       } else if (result.length > 16) {
+        
         //4
         const price = await db
-          .from("zones")
-          .select("price")
-          .where("id", 3)
-          .first()
-          .then(function (price) {
+        .from("zones")
+        .select("price")
+        .where("id", 3)
+        .first()
+        .then(function (price) {
             if (!price) {
               return res.status(400).send("error: pls enter price");
-            } else {
+            } else {console.log(price);
               return res.status(200).json(price.price);
             }
-          });
-      } else {
-        return res.status(200).send("No route");
-      }
-    }
-  );
+          });console.log(price);
+          return res.status(200).send("No route");
+        } 
+        console.log(result.length);
+    });
+  
   
   function getRouteStation(routes, from, to) {
     let originId = parseInt(from);
