@@ -33,6 +33,7 @@
           {{/isAdmin}}
 
           {{#isNormal}}
+          <li><a href="/subscriptions/purchase">subsription</a></li>
           <li><a href="/tickets/purchase">tickets</a></li>
           <li><a href="/rises/simulate">Rides</a></li>
           <li><a href="requests/senior">Request Senior</a></li>

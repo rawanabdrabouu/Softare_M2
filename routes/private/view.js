@@ -52,8 +52,11 @@ module.exports = function (app) {
   app.get('/subscriptions/purchase', async function(req, res) {
     const user = await getUser(req);
     const zones = await db.from('zones').select('*');
+    const subs = await db.from('subsription').select("*").where("userid",user.userid);
+    const rides = await db.from("rides").select("*").where("userid",user.userid);
+    
     // const subs= await db.from(subsription).select("*").where("userid","=",user.userid);
-    return res.render('subscriptions/purchase.hjs', {user , zones});
+    return res.render('subscriptions/purchase.hjs', {user , zones, subs,rides});
   });
 
   app.get('/requests/senior', async function(req, res) {
@@ -130,6 +133,7 @@ module.exports = function (app) {
   app.get('/tickets/purchase', async function(req, res) {
     const user = await getUser(req);
     const stations = await db.from("stations").select("*")
+    
        return res.render('tickets/purchase.hjs', {user,stations});
   });
   app.get('/rises/simulate', async function(req, res) {

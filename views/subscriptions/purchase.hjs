@@ -119,6 +119,57 @@
                 {{/zones}}
             </thead>
         </table>
+
+        <table class="table" style="margin-left: 20px;">
+            <thead>
+                <tr>
+                    <th scope="col">id</th>
+                    <th scope="col">subType</th>
+                    <th scope="col">zone id</th>
+                    <th scope="col">user id</th>
+                    <th scope="col">nooftickets</th>
+
+                </tr>
+                {{#subs}}
+                <tr>
+                    <td>{{id}}</td>
+                    <td>{{subtype}}</td>
+                    <td>{{zoneid}}</td>
+                    <td>{{userid}}</td>
+                    <td>{{nooftickets}}</td>
+                    <td>
+                </tr>
+                {{/subs}}
+            </thead>
+        </table>
+
+        <table class="table" style="margin-left: 20px;">
+            <thead>
+                <tr>
+                    <th scope="col">id</th>
+                    <th scope="col">status</th>
+                    <th scope="col">origin</th>
+                    <th scope="col">destination</th>
+                    <th scope="col">userid</th>
+                    <th scope="col">ticketid</th>
+                    <th scope="col">tripdate</th>
+
+
+                </tr>
+                {{#rides}}
+                <tr>
+                    <td>{{id}}</td>
+                    <td>{{status}}</td>
+                    <td>{{origin}}</td>
+                    <td>{{destination}}</td>
+                    <td>{{userid}}</td>
+                    <td>{{ticketid}}</td>
+                    <td>{{tripdate}}</td>
+                    <td>
+                </tr>
+                {{/rides}}
+            </thead>
+        </table>
   </div>
 </body>
 </html>

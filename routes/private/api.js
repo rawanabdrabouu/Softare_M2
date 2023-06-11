@@ -5,6 +5,7 @@ const roles = require("../../constants/roles");
 const { getSessionToken } = require("../../utils/session");
 const { default: knex, Knex } = require("knex");
 const { log } = require("async");
+const { request } = require("express");
 
 const getUser = async function (req) {
   const sessionToken = getSessionToken(req);
@@ -171,6 +172,20 @@ module.exports = function (app) {
       .where("nooftickets", "=", nooftickets)
       .insert(subdata);
 
+      const subId= await db . from("subsription").select("id").where("userid",userId).first()
+console.log(subId);
+    const transaction = {
+      amount: payedAmount,
+      userid: userId,
+      purchasedid :subId.id,
+      purchasetype:"subscription"
+    }
+
+
+    const tran= await db.from("transactions")
+    .insert(transaction).returning('*')
+
+   
     return res.status(200).send("sub 100");
   });
 
@@ -328,7 +343,7 @@ module.exports = function (app) {
     };
 
     try {
-      const request = await db("tickets").insert(ticket).returning("*");
+      var request = await db("tickets").insert(ticket).returning("*");
     } catch (e) {
       return res.status(400).send("Could not store ticket");
     }
@@ -346,14 +361,14 @@ module.exports = function (app) {
       origin: origin,
       destination: destination,
       userid: user.userid,
-      ticketid: subId,
+      ticketid: request[0].id,
       tripdate: tripDate,
     };
     try {
       const request = await db("rides").insert(adding_rides).returning("*");
-      res.status(200).send("successfully added the ride!");
+      return res.status(200).send("successfully added the ride!");
     } catch (e) {
-      res.status(400).send("Could not store rides");
+      return res.status(400).send("Could not store rides");
     }
 
     const sub = await db.from("subsription").where("id", "=", subId);
@@ -362,7 +377,7 @@ module.exports = function (app) {
       .from("subsription")
       .where("id", "=", subId)
       .update({ nooftickets: sub[0].nooftickets - 1 });
-    res.status(200).send("successfully added the ride!");
+    return res.status(200).send("successfully added the ride!");
   });
 
   app.put("/api/v1/requests/senior/:requestId", async function (req, res) {
@@ -921,15 +936,92 @@ module.exports = function (app) {
       return res.status(400).send("Missing Required Parameters");
     }
 
-    await db
-      .from("rides")
-      .where({
-        userid: user.id,
-        origin: originn,
-        destination: destinationn,
-        tripdate: tripDate,
-      })
-      .update({ status: "completed" });
-    return res.status(200).send("Ride Can Start");
+    await db.from("rides").where({
+      userid: user.id,
+      origin: originn,
+      destination: destinationn,
+      tripdate: tripDate
+    }).update(
+      { status: "completed" })
+    return res.status(200).send('Ride Can Start');
+  }
+
+  );
+
+  //------------------------------------BONUS-------------------------------------------------
+  //check 3ala table tickets kolaha:
+  //1.get origin  w destination
+  //2.compare origin w destination bel stationname column in stations table law mawgood yb2a not deleted
+  //3.law mesh mawgood yb2a copy request refund api
+  //req: null
+  app.post('/api/v1/checkdelete', async function (req, res){
+    const user = await getUser(req);
+    const ticketinfo = await db.from('tickets').select('*')
+    const stationinfo = await db.from('stations').select('stationname')
+    const routeinfo = await db.from('routes').select('routename')
+    var deleted = false;
+    // const x = db.forEach()
+    console.log(ticketinfo)
+    ticketinfo.forEach(ticket => async function (ticket) {
+      var origin = ticket.origin;
+      var destination = ticket.destination;
+      stationinfo.forEach(station => async function (stationname) {
+        var stationname = stationname.stationname;
+        if(origin == stationname || destination == stationname){
+          deleted = false;
+        }else{
+          deleted = true;
+          const amount = await db.from('transactions').select('amount').where('userid', user.userid).where('purchasedid', ticket.id)
+          if(deleted){
+            const newRequest = {
+              status: "pending",
+              userid: user.userid,
+              refundamount: amount,
+              ticketid: ticket.id
+            };
+            try {
+              const request = await db("refund_requests")
+                .insert(newRequest)
+                .returning("*");
+
+              return res.status(200).send("request saved");
+            } catch (e) {
+              console.log(e.message);
+              return res.status(400).send("Could not store the request");
+            }
+          }
+        }
+      });
+      routeinfo.forEach(route => async function (routename) {
+        var routename = routename.routename;
+        if(routename == routename){
+          deleted = false;
+        }else{
+          deleted = true;
+          const amount = await db.from('transactions').select('amount').where('userid', user.userid).where('purchasedid', ticket.id)
+          if(deleted){
+            const newRequest = {
+              status: "pending",
+              userid: user.userid,
+              refundamount: amount,
+              ticketid: ticket.id
+            };
+            try {
+              const request = await db("refund_requests")
+                .insert(newRequest)
+                .returning("*");
+
+              return res.status(200).send("request saved");
+            } catch (e) {
+              console.log(e.message);
+              return res.status(400).send("Could not store the request");
+            }
+          }
+        }
+      });
+  });
+
+    return res.status(200).send("request saved");
+
   });
 };
